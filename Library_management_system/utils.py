@@ -11,3 +11,14 @@ def create_member_id(member_name):
 
 def compute_due_date( start: date, days : int ):
     return start + timedelta(days=days)
+
+def create_isbn():
+    """Generates a random 13-digit ISBN."""
+    prefix = "978"
+    core = "".join(str(random.randint(0, 9)) for _ in range(9))
+    return prefix+core
+
+def create_author_id(name:str):
+    pre = str(sum(ord(c) for c in name))
+    core = "".join(str(ord(c))[0] for c in name)
+    return pre+core
