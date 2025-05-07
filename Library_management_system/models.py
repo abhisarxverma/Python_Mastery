@@ -33,16 +33,18 @@ class Author:
 class Book:
     """Represents a Book in Library"""
 
-    def __init__(self, title, author:Author=None, isbn:str=None, copies_available:int=1 ):
+    def __init__(self, title, author:Author=None, isbn:str=None, total_copies:int=1 ):
         self.title = title
         self.author = author
         self.isbn = isbn or create_isbn()
+        self.total_copies = total_copies
         
-        if copies_available < 1: raise ValueError("Copies available of a book must be greater than 0.")
-        else : self.copies_available = copies_available
+        if total_copies < 1: raise ValueError("Total copies available in library of a book must be greater than 0.")
+        
+        self.available_copies = total_copies
 
     def __repr__(self):
-        return f"[Book] {self.title} by {self.author.name} ISBN:{self.isbn} Copies_available:{self.copies_available}"
+        return f"\n[Book] \nTitle: {self.title} \nAuthor: {self.author.name} \nISBN: {self.isbn} \nTotal copies : {self.total_copies} \nCopies_available:{self.available_copies}"
     
     def __hash__(self):
         return hash((self.title, self.isbn))
@@ -60,7 +62,7 @@ class Member:
         self.current_loans = current_loans or []
 
     def __repr__(self):
-        return f"[Member] Member_id:{self.member_id!r} Member_name:{self.name!r}"
+        return f"\n[Member] \nMember_id:{self.member_id!r} \nMember_name:{self.name!r}"
     
     def __hash__(self):
         return hash((self.name, self.member_id))
@@ -71,12 +73,15 @@ class Member:
 class Loan:
     """Represents a Book Loan issued by a Member of Library"""
 
-    def __init__(self, book:Book, member:Member, loan_date:datetime.date=None, due_date:datetime.date=None, returned_date:datetime.date=None):
+    def __init__(self, book:Book, member:Member, loan_date:datetime.date=None, loan_days:int=None, returned_date:datetime.date=None):
         self.book = book
         self.member = member
         self.loan_date = loan_date or date.today()
-        self.due_date = due_date or compute_due_date(date.today(), DEFAULT_DUE_DAYS)
+        self.due_date = date.today() + timedelta(days=loan_days) if loan_days else compute_due_date(date.today(), DEFAULT_DUE_DAYS)
         self.returned_date = returned_date
 
     def __repr__(self):
-        return f"[Loan] {self.member.name} for {self.book.title} on {self.loan_date.isoformat()}"
+        return f"\n[Loan] \nMember name : {self.member.name} \nBook name : {self.book.title} \nIssue date : {self.loan_date.isoformat()} \nDue return date : {self.due_date}"
+    
+    def __eq__(self, other:"Loan"):
+        return isinstance(other, Loan) and self.book.isbn == other.book.isbn and self.member.member_id == other.member.member_id

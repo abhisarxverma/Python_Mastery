@@ -18,16 +18,69 @@ class Library:
 
         return new_member
     
-    def add_new_book(self, book_title:str, author_name:str, copies_of_books:int=None ):
-        """Add a new book in library under the Existing author if exists else add new author also and then add book under them."""
-
-        matching_authors = self.catalog.find_author_by_name(author_name)
+    def find_member(self, member_id:str):
+        """Finds and return the member with the given member_id if exists else return None"""
+        for member in self.members:
+            if member.member_id == member_id:
+                return member
         
-        if not matching_authors:
-            new_book = Book(book_title, Author(author_name), copies_available=copies_of_books)
+        return None
+    
+    def find_loan(self, member_id:str, book_title:str):
+
+        member = self.find_member(member_id)
+        if not member: raise ValueError(f"Member with ID {member_id} does not exist.")
+
+        loan = None
+        for member_loan in member.current_loans:
+            if member_loan.book.title.lower() == book_title.lower():
+                loan = member_loan
+
+        return loan
+    
+    def add_new_book(self, book_title:str, author_name:str, total_copies:int=1 ):
+        """Add a new book in library under the Existing author if exists, else add new author also and then add book under them."""
+
+        author = self.catalog.find_author_by_name(author_name)
+        
+        if not author:
+            new_book = Book(book_title, new_author:=Author(author_name), total_copies=total_copies)
+            self.catalog.authors.add(new_author)
         else:
-            author = matching_authors[0]
-            new_book = Book(book_title, author=author, copies_available=copies_of_books)
+            new_book = Book(book_title, author=author, total_copies=total_copies)
 
         self.catalog.add_book(new_book)
+        return new_book
+    
+    def loan_book(self, member_id:str, book_title:str, days:int=None):
+        """Create a new loan by the member for the book for given number of days after checking if the member exist with the member_id given and the book exist in the library."""
+
+        book = self.catalog.find_book_by_title(book_title)
+        if not book: raise ValueError(f"{book_title} book is not present in library")
+
+        member = self.find_member(member_id) 
+        if not member: raise ValueError(f"Member with {member_id} does not exist. Please check once again.")
+
+        new_loan = self.loan_service.create_loan(book, member, days)
+
+        return new_loan
+    
+    def return_book(self, member_id:str, book_title:str):
+        """Return book, by finding the loan of the member in which the book corresponds to the book_title given."""
+
+        loan = self.find_loan(member_id, book_title)
+        if not loan: raise ValueError(f"No loan exist by Member with id {member_id} for book {book_title}")
+
+        self.loan_service.return_loan(loan)
+
         return True
+    
+    def search_books(self, search_title:str):
+        """Find the books whose title contains the search title query."""
+        return [book for book in self.catalog.books if search_title.lower() in book.title.lower()]
+    
+    def search_authors(self, search_name:str):
+        """Find the authors whose name contains the search name query."""
+        return [author for author in self.catalog.authors if search_name.lower() in author.name.lower()]
+    
+
