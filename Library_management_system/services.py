@@ -28,11 +28,29 @@ class LoanService:
     def return_loan(self, loan:Loan):
         """End the loan by removing the loan from the member's current loans and incrementing the book copies availble."""
 
+        # check if the loan exist
         if loan not in loan.member.current_loans:
             raise ValueError(f"Loan record not found for member {loan.member.name} for book {loan.book.title}.")
+
+        penalty = self.calculate_penalty(loan)
+        if penalty: print(f"You have to pay penalty of Rs{penalty}")
 
         loan.returned_date = date.today()
         loan.book.available_copies += 1
         loan.member.current_loans.remove(loan)
 
         return True
+    
+    def is_overdue(self, loan:Loan):
+        """Return True if today's date is more than the due_date of the loan, else return False."""
+        
+        if date.today() > loan.due_date: return True
+        else : return False
+
+    def calculate_penalty(self, loan: Loan) -> float:
+        if self.is_overdue(loan):
+            days_late = (date.today() - loan.due_date).days
+            return days_late * 5  # e.g., ₹5/day
+        return 0.0
+
+

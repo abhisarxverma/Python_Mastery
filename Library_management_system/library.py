@@ -11,6 +11,13 @@ class Library:
         self.catalog = LibraryCatalog()
         self.loan_service = LoanService()
 
+        #Import data from json
+        data = self.catalog.import_from_json("exported_data.json")
+        for book in data:
+            new_book = self.add_new_book(book["title"], book["author"], total_copies=book["total_copies"])
+            new_book.available_copies = book["available_copies"]
+            self.catalog.books.add(new_book)
+
     def register_member(self, name):
         """Create a new member and add them to the library's member's set."""
         new_member = Member(name)
@@ -39,7 +46,12 @@ class Library:
         return loan
     
     def add_new_book(self, book_title:str, author_name:str, total_copies:int=1 ):
-        """Add a new book in library under the Existing author if exists, else add new author also and then add book under them."""
+        """Add a new book in library under the Existing author if author exists, else add new author also and then add book under them."""
+
+        # check if the book with the same name and the same author exists
+        for book in self.catalog.books:
+            if book.title == book_title and book.author.name == author_name:
+                raise ValueError(f"Book with title {book_title} and Author {author_name} already exists.")
 
         author = self.catalog.find_author_by_name(author_name)
         
@@ -75,9 +87,13 @@ class Library:
 
         return True
     
-    def search_books(self, search_title:str):
+    def search_books_by_title(self, search_title:str):
         """Find the books whose title contains the search title query."""
         return [book for book in self.catalog.books if search_title.lower() in book.title.lower()]
+    
+    def search_books_by_author_name(self, author_name:str):
+        """Find the books whose author's name matches the given author name, return empty list if not found."""
+        return [book for book in self.catalog.books if author_name.lower() in book.author.name.lower()]
     
     def search_authors(self, search_name:str):
         """Find the authors whose name contains the search name query."""

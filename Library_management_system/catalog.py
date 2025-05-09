@@ -1,5 +1,6 @@
 from models import *
 from typing import List
+import json, os
 
 class LibraryCatalog :
 
@@ -40,3 +41,16 @@ class LibraryCatalog :
             if author.name.lower() == search_name.lower() or search_name.lower() in author.name.lower():
                 search_author = author
         return search_author
+
+    def export_to_json(self, filepath):
+        """Export the library books data in catalog to the json."""
+        serialized_data = [book.serialize() for book in self.books]
+        with open(filepath, 'w') as file:
+            json.dump(serialized_data, file, indent=4)
+        return True
+
+    def import_from_json(self, filepath):
+        """Import the books data from the given json file path."""
+        with open(filepath, 'r') as data_file:
+            data = json.load(data_file)
+        return data

@@ -17,7 +17,10 @@ class Author:
         self.id = id or create_author_id(self.name)
 
     def __repr__(self):
-        return f"[Author] {self.name}"
+        return f"Author({self.name!r})"
+    
+    def __str__(self):
+        return f"Author {self.name!r}"
     
     def add_book(self, book:"Book"):
         book.author = self
@@ -42,15 +45,28 @@ class Book:
         if total_copies < 1: raise ValueError("Total copies available in library of a book must be greater than 0.")
         
         self.available_copies = total_copies
+        self.author.add_book(self)
 
     def __repr__(self):
-        return f"\n[Book] \nTitle: {self.title} \nAuthor: {self.author.name} \nISBN: {self.isbn} \nTotal copies : {self.total_copies} \nCopies_available:{self.available_copies}"
+        return f"Book(Title={self.title!r} Author={self.author.name!r} ISBN={self.isbn!r} Total copies={self.total_copies!r} Copies_available={self.available_copies!r}"
     
+    def __str__(self):
+        return f"Book {self.title!r} by {self.author.name!r}, {self.available_copies} copies available in library."
+
     def __hash__(self):
         return hash((self.title, self.isbn))
     
     def __eq__(self, other:"Book"):
-        return isinstance(other, Book) and self.title == other.title and self.isbn == other.isbn
+        return isinstance(other, Book) and self.title == other.title and self.isbn == other.isbn and self.author == other.author
+    
+    def serialize(self):
+        return {
+            "title" : self.title,
+            "author" : self.author.name,
+            "isbn" : self.isbn,
+            "total_copies" : self.total_copies,
+            "available_copies" : self.available_copies
+        }
     
 class Member:
     "Represents a Member of the Library"
@@ -62,7 +78,10 @@ class Member:
         self.current_loans = current_loans or []
 
     def __repr__(self):
-        return f"\n[Member] \nMember_id:{self.member_id!r} \nMember_name:{self.name!r}"
+        return f"Member(Member_id={self.member_id!r} Member_name={self.name!r}"
+    
+    def __str__(self):
+        return f"Member {self.name!r}"
     
     def __hash__(self):
         return hash((self.name, self.member_id))
@@ -81,7 +100,10 @@ class Loan:
         self.returned_date = returned_date
 
     def __repr__(self):
-        return f"\n[Loan] \nMember name : {self.member.name} \nBook name : {self.book.title} \nIssue date : {self.loan_date.isoformat()} \nDue return date : {self.due_date}"
+        return f"Loan(Member name={self.member.name!r} Book name={self.book.title!r} Issue date={self.loan_date.isoformat()} Due return date={self.due_date!r}"
     
+    def __str__(self):
+        return f"Loan by {self.member.name!r} for book {self.book.title!r} by {self.book.author.name} on {self.loan_date.isoformat()}"
+
     def __eq__(self, other:"Loan"):
         return isinstance(other, Loan) and self.book.isbn == other.book.isbn and self.member.member_id == other.member.member_id

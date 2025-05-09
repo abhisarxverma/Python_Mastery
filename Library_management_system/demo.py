@@ -1,6 +1,7 @@
 from models import *
 from services import LoanService
 from library import Library
+import json
 
 library = Library()
 print(library.catalog)
@@ -51,9 +52,28 @@ book6 = library.add_new_book("5 am club", "Robin Sharms")
 print(library.catalog)
 
 # Now let's search books
-book_search_result = library.search_books("slave")
+book_search_result = library.search_books_by_title("slave")
 print(book_search_result)
+
+# Now let's find the books by author names
+austin_kleon_books = library.search_books_by_author_name("kleon")
+print(f"Search result for austin kleon books : {[book.author for book in austin_kleon_books]}")
 
 # Now let's search authors
 author_search_result = library.search_authors("kleon")
 print(author_search_result)
+
+stephen_king = Author("Stephen king")
+it = Book("IT", stephen_king)
+it_chapter2 = Book("IT-2", stephen_king)
+in_a_tall_grass = Book("In a Tall Grass", stephen_king)
+
+for book in stephen_king.books:
+    print(book)
+
+# Let's try to export the library catalog data
+library.catalog.export_to_json("exported_data.json")
+
+# Let's try to import the library catalog data
+data = library.catalog.import_from_json("exported_data.json")
+print(data)
