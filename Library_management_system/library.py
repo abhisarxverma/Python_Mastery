@@ -1,6 +1,7 @@
 from models import Loan, Book, Author, Member
 from catalog import LibraryCatalog
 from services import LoanService
+from utils import *
 
 from typing import Set
 
@@ -11,7 +12,7 @@ class Library:
         self.catalog = LibraryCatalog()
         self.loan_service = LoanService()
 
-        #Import data from json
+        #import data from json
         data = self.catalog.import_from_json("exported_data.json")
         for book in data:
             new_book = self.add_new_book(book["title"], book["author"], total_copies=book["total_copies"])
@@ -34,7 +35,7 @@ class Library:
         return None
     
     def find_loan(self, member_id:str, book_title:str):
-
+        """Finds and return the loan with the member_id and the book_title return None if not found."""
         member = self.find_member(member_id)
         if not member: raise ValueError(f"Member with ID {member_id} does not exist.")
 
@@ -62,6 +63,7 @@ class Library:
             new_book = Book(book_title, author=author, total_copies=total_copies)
 
         self.catalog.add_book(new_book)
+        self.catalog.export_to_json("exported_data.json")
         return new_book
     
     def loan_book(self, member_id:str, book_title:str, days:int=None):
@@ -83,8 +85,10 @@ class Library:
         loan = self.find_loan(member_id, book_title)
         if not loan: raise ValueError(f"No loan exist by Member with id {member_id} for book {book_title}")
 
-        self.loan_service.return_loan(loan)
+        if fine := self.loan_service.calculate_penalty(loan):
+            loan.member.fine_balance += fine
 
+        self.loan_service.return_loan(loan)
         return True
     
     def search_books_by_title(self, search_title:str):
@@ -98,5 +102,20 @@ class Library:
     def search_authors(self, search_name:str):
         """Find the authors whose name contains the search name query."""
         return [author for author in self.catalog.authors if search_name.lower() in author.name.lower()]
+    
+    def get_fine(self, member_id:str):
+        """Show the fine of the member by finding the member by member id."""
+        member = self.find_member(member_id)
+        if not member: raise ValueError(f"Invalid member id: {member_id}Please recheck.")
+        fine = member.fine_balance
+        return fine
+    
+    def pay_fine(self, member_id:str, amount: int):
+        """Pay Fine by finding the member by member id and subtracting the amount paid from the member's fine balance."""
+        member = self.find_member(member_id)
+        if not member: raise ValueError(f"Invalid Member id : {member_id}. Please recheck.")
+        member.fine_balance -= amount
+        return True
+
     
 

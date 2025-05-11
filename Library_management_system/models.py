@@ -76,6 +76,7 @@ class Member:
         self.member_id = member_id or create_member_id(self.name)
         self.max_loans = max_loans
         self.current_loans = current_loans or []
+        self.fine_balance = 0
 
     def __repr__(self):
         return f"Member(Member_id={self.member_id!r} Member_name={self.name!r}"

@@ -32,9 +32,6 @@ class LoanService:
         if loan not in loan.member.current_loans:
             raise ValueError(f"Loan record not found for member {loan.member.name} for book {loan.book.title}.")
 
-        penalty = self.calculate_penalty(loan)
-        if penalty: print(f"You have to pay penalty of Rs{penalty}")
-
         loan.returned_date = date.today()
         loan.book.available_copies += 1
         loan.member.current_loans.remove(loan)
@@ -50,7 +47,7 @@ class LoanService:
     def calculate_penalty(self, loan: Loan) -> float:
         if self.is_overdue(loan):
             days_late = (date.today() - loan.due_date).days
-            return days_late * 5  # e.g., ₹5/day
+            return days_late * 5 #₹5/day
         return 0.0
 
 
