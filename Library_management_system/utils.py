@@ -42,3 +42,8 @@ def create_author_id(name:str):
     pre = str(sum(ord(c) for c in name))
     core = "".join(str(ord(c))[0] for c in name)
     return pre+core
+
+def create_loan_id(book_title:str, member_id:str):
+    pre = str(sum(ord(c) for c in book_title))
+    core = "".join(random.shuffle(member_id))
+    return pre+core

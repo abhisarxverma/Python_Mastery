@@ -3,6 +3,9 @@ from models import *
 from library import Library
 from utils import *
 
+BASE_COLOR = BRIGHT_CYAN
+INPUT_COLOR = MAGENTA
+
 library = Library()
 
 def check_minimum_length(string):
@@ -12,7 +15,7 @@ def check_minimum_length(string):
 
 def get_validated_input(prompt, validation_fn, error_message):
     while True:
-        value = input(f"{MAGENTA}\n{prompt}")
+        value = input(f"{INPUT_COLOR}\n{prompt}")
         if validation_fn(value):
             return value
         print(f"{RED}\n{error_message}")
@@ -24,7 +27,7 @@ def show_error_message(message):
     print(f"{RED}\nError occured : {message}")
 
 def take_general_input(prompt, color=None):
-    user_input = input(f"{color or MAGENTA}\n{prompt}")
+    user_input = input(f"{color or INPUT_COLOR}\n{prompt}")
     return user_input
 
 def print_book_search_result(result):
@@ -36,7 +39,7 @@ def show_general_message(message):
 
 def take_int_input(message):
     try:
-        user_input = int(input(f"{MAGENTA}{message}"))
+        user_input = int(input(f"{INPUT_COLOR}{message}"))
         return user_input
     except ValueError as e:
         print(e)
@@ -45,9 +48,9 @@ def take_int_input(message):
 
 def main():
 
-    print(f"{BRIGHT_CYAN}Welcome to the Library Management System.\n")
+    print(f"{BASE_COLOR}Welcome to the Library Management System.\n")
     while True:
-        print(f"\n{BRIGHT_CYAN}Enter operation : \n")
+        print(f"\n{BASE_COLOR}Enter operation : \n")
         print("""1 - Register Member
 2 - Add Book
 3 - Loan Book
@@ -140,9 +143,9 @@ def main():
             
         elif user_choice == 5:
             while True:
-                print(f"{BRIGHT_CYAN}1 - Search by Book name\n2 - Search by Author name\n")
+                print(f"{BASE_COLOR}1 - Search by Book name\n2 - Search by Author name\n")
                 try:
-                    selection = int(input(f"{MAGENTA}\nEnter search key: "))
+                    selection = take_int_input("Enter search key: ")
                 except ValueError as e:
                     show_error_message("Please enter valid choice.")
                     break
@@ -169,7 +172,7 @@ def main():
             current_fine = member.fine_balance
             if not current_fine:
                 show_general_message("No Fine Balance to pay. Thank you!")
-                break
+                continue
             show_general_message(f"{member.name}'s outstanding fine : {current_fine}")
             amount = take_int_input("Enter the amount to pay: ")
             try:

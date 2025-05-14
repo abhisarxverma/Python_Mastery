@@ -13,7 +13,6 @@ class Author:
     def __init__(self, name:str, biography:str=None, id:str=None, books:Optional[List["Book"]] = None ):
         self.name = name
         self.biography = biography
-        self.books = books or set()
         self.id = id or create_author_id(self.name)
 
     def __repr__(self):
@@ -31,6 +30,13 @@ class Author:
     
     def __eq__(self, other):
         return isinstance(other, Author) and self.name == other.name and self.id == other.id
+    
+    def serialize(self):
+        return {
+            "id" : self.id,
+            "name" : self.name,
+            "biography" : self.biography,
+        }
 
 
 class Book:
@@ -71,12 +77,12 @@ class Book:
 class Member:
     "Represents a Member of the Library"
 
-    def __init__(self, name, member_id=None, max_loans=5, current_loans:Optional[List["Loan"]] = None):
+    def __init__(self, name, member_id=None, max_loans=5, fine_balance: int=0, current_loans_count: int=0):
         self.name = name
         self.member_id = member_id or create_member_id(self.name)
         self.max_loans = max_loans
-        self.current_loans = current_loans or []
-        self.fine_balance = 0
+        self.fine_balance = fine_balance
+        self.current_loans_count = current_loans_count
 
     def __repr__(self):
         return f"Member(Member_id={self.member_id!r} Member_name={self.name!r}"
@@ -88,17 +94,27 @@ class Member:
         return hash((self.name, self.member_id))
     
     def __eq__(self, other):
-        return isinstance(other, Book) and self.name == other.name and self.member_id == self.member_id
+        return isinstance(other, Member) and self.name == other.name and self.member_id == self.member_id
+    
+    def serialize(self):
+        return {
+            "id" : self.member_id,
+            "name" : self.name,
+            "fine_balance" : self.fine_balance,
+            "max_loans" : self.max_loans,
+            "current_loans_count" : self.current_loans_count,
+        }
     
 class Loan:
     """Represents a Book Loan issued by a Member of Library"""
 
-    def __init__(self, book:Book, member:Member, loan_date:datetime.date=None, loan_days:int=None, returned_date:datetime.date=None):
-        self.book = book
-        self.member = member
-        self.loan_date = loan_date or date.today()
-        self.due_date = date.today() + timedelta(days=loan_days) if loan_days else compute_due_date(date.today(), DEFAULT_DUE_DAYS)
-        self.returned_date = returned_date
+    def __init__(self, book:Book, member:Member, loan_date:datetime.date=None, loan_days:int=None, returned_date:datetime.date=None, id: str=None):
+        self.id = id or create_loan_id(book.title, member.member_id)
+        self.book: Book = book
+        self.member: Member = member
+        self.loan_date: date = loan_date or date.today()
+        self.due_date: date = date.today() + timedelta(days=loan_days) if loan_days else compute_due_date(date.today(), DEFAULT_DUE_DAYS)
+        self.returned_date: date = returned_date
 
     def __repr__(self):
         return f"Loan(Member name={self.member.name!r} Book name={self.book.title!r} Issue date={self.loan_date.isoformat()} Due return date={self.due_date!r}"
@@ -108,3 +124,12 @@ class Loan:
 
     def __eq__(self, other:"Loan"):
         return isinstance(other, Loan) and self.book.isbn == other.book.isbn and self.member.member_id == other.member.member_id
+    
+    def serialize(self):
+        return {
+            "book" : self.book.title,
+            "member_id" : self.member.member_id,
+            "loan_date" : self.loan_date.isoformat(),
+            "due_date" : self.due_date.isoformat(),
+            "returned_date" : self.returned_date.isoformat()
+        }
