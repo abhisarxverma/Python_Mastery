@@ -1,79 +1,9 @@
-[
-    {
-        "title": "The pragmatic Programmer",
-        "author": "Andrew Hunt",
-        "isbn": "978764671310",
-        "total_copies": 2,
-        "available_copies": 2
-    },
-    {
-        "title": "Ready Player One",
-        "author": "steve wozniak",
-        "isbn": "978464134419",
-        "total_copies": 5,
-        "available_copies": 5
-    },
-    {
-        "title": "The Maze Runner",
-        "author": "James Dashner",
-        "isbn": "978535584679",
-        "total_copies": 1,
-        "available_copies": 1
-    },
-    {
-        "title": "The Pragmatic Programmer",
-        "author": "Andrew Hunt",
-        "isbn": "978915613055",
-        "total_copies": 1,
-        "available_copies": 1
-    },
-    {
-        "title": "Build Don't talk",
-        "author": "Raj Shamani",
-        "isbn": "978254299411",
-        "total_copies": 3,
-        "available_copies": 3
-    },
-    {
+{
+    "978067418540": {
         "title": "Show your work",
-        "author": "Austin Kleon",
-        "isbn": "978459190581",
+        "author": "Paulo Coelho",
+        "isbn": "978067418540",
         "total_copies": 5,
         "available_copies": 5
-    },
-    {
-        "title": "I came upon a lighthouse",
-        "author": "Shantanu Naidu",
-        "isbn": "978757177511",
-        "total_copies": 3,
-        "available_copies": 3
-    },
-    {
-        "title": "Keep Going",
-        "author": "Austin Kleon",
-        "isbn": "978616380878",
-        "total_copies": 1,
-        "available_copies": 1
-    },
-    {
-        "title": "Shadow Slave",
-        "author": "Guiltythree",
-        "isbn": "978719086590",
-        "total_copies": 1,
-        "available_copies": 1
-    },
-    {
-        "title": "The Alchemist",
-        "author": "Paulo Coelho",
-        "isbn": "978862505689",
-        "total_copies": 8,
-        "available_copies": 8
-    },
-    {
-        "title": "5 am club",
-        "author": "Robin Sharms",
-        "isbn": "978873954724",
-        "total_copies": 1,
-        "available_copies": 1
     }
-]
+}

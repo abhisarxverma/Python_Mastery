@@ -1,5 +1,5 @@
 # Command line Interface Implementation for the Library management system
-from models import *
+from models import Book, Author, Loan, Member
 from library import Library
 from utils import *
 
@@ -39,7 +39,7 @@ def show_general_message(message):
 
 def take_int_input(message):
     try:
-        user_input = int(input(f"{INPUT_COLOR}{message}"))
+        user_input = int(input(f"\n{INPUT_COLOR}{message}"))
         return user_input
     except ValueError as e:
         print(e)
@@ -88,7 +88,7 @@ def main():
                 book_author_name = get_validated_input(f"Enter Author name: ", check_minimum_length, f"Author name must be atleast 3 characters")
 
                 try:
-                    total_copies = int(input(f"{MAGENTA}Enter number of copies: "))
+                    total_copies = take_int_input("Enter number of copies: ")
                 except ValueError as e:
                     total_copies = None
                 if total_copies and total_copies < 1:
@@ -142,6 +142,9 @@ def main():
                     break
             
         elif user_choice == 5:
+            if not library.get_total_books():
+                show_general_message("Library is Currently Empty. Sorry for the Inconvenience!")
+                continue
             while True:
                 print(f"{BASE_COLOR}1 - Search by Book name\n2 - Search by Author name\n")
                 try:
@@ -157,13 +160,13 @@ def main():
                 if selection == 1:
                     book_title = take_general_input(prompt="Enter book name: ")
                     result_books = library.search_books_by_title(book_title)
-                    print_book_search_result(result_books)
+                    print_book_search_result(result_books) if result_books else show_general_message("No Book Found.")
                     break
 
                 elif selection == 2:
                     author_name = take_general_input(prompt="Enter author name: ")
                     result_books = library.search_books_by_author_name(author_name)
-                    print_book_search_result(result_books)
+                    print_book_search_result(result_books) if result_books else show_general_message("No Book Found.")
                     break
 
         elif user_choice == 6:

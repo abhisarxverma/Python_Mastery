@@ -1,21 +1,20 @@
 from models import *
-from typing import List
-import json
-
 
 class LibraryCatalog :
 
     def __init__(self):
         self.books : dict = {}
         self.authors : dict = {}
+        self.total_books = len(self.books)
 
     def __repr__(self):
         return f"Books : {[book.title for book in self.books]}\nAuthors : {[author.name for author in self.authors]}"
 
     def add_book(self, book:Book):
         '''Add book in Library if the book is not already present.'''
-        if not self.books.get(book.isbn, None): raise ValueError(f"{book.title} is already in Library.")
+        if self.books.get(book.isbn, None): raise ValueError(f"{book.title} is already in Library.")
         self.books[book.isbn] = book
+        self.total_books += 1
 
     def remove_book(self, book:Book):
         '''Remove book from Library if the book is present in Library.'''

@@ -1,5 +1,7 @@
 # 📚 Library Management System
 
+## You can refer to the [Last changes file](LAST_CHANGES.md) to get to do next tasks.
+
 ## **Module Overview**
 A structured implementation of a Library Management System, categorized into key modules.
 

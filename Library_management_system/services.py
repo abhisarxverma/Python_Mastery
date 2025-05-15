@@ -1,8 +1,5 @@
 from models import Loan, Book, Author, Member
 from datetime import datetime, date
-import json
-
-LOANS_DATA_PATH = "data/loans.json"
 
 class LoanService:
 
@@ -11,6 +8,7 @@ class LoanService:
 
         new_loan = Loan(book, member, loan_days=days)
         book.available_copies -= 1
+        member.current_loans_count += 1
 
         return new_loan
     

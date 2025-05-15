@@ -1,7 +1,9 @@
-# Code for some utility functions for the orthogonality among models
+# Code for some utility functions to maintain the orthogonality among models
 
 from datetime import datetime, date, timedelta
 import random
+
+LOG_FILE_PATH = "log.txt"
 
 BLACK   = "\033[30m"
 RED     = "\033[31m"
@@ -47,3 +49,7 @@ def create_loan_id(book_title:str, member_id:str):
     pre = str(sum(ord(c) for c in book_title))
     core = "".join(random.shuffle(member_id))
     return pre+core
+
+def log_some_text(text, filepath=LOG_FILE_PATH):
+    with open(filepath, "w") as file:
+        file.write(text)

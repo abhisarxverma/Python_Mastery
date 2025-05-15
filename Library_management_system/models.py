@@ -1,16 +1,14 @@
 # Implemetation of the objects/models of the project
 
-from typing import List, Optional
 from datetime import datetime, timedelta, date
 from utils import *
-import random
 
 DEFAULT_DUE_DAYS  = 10
 
 class Author:
     """Represents a Author"""
 
-    def __init__(self, name:str, biography:str=None, id:str=None, books:Optional[List["Book"]] = None ):
+    def __init__(self, name:str, biography:str=None, id:str=None):
         self.name = name
         self.biography = biography
         self.id = id or create_author_id(self.name)
@@ -22,8 +20,7 @@ class Author:
         return f"Author {self.name!r}"
     
     def add_book(self, book:"Book"):
-        book.author = self
-        self.books.add(book)
+        pass
 
     def __hash__(self):
         return hash((self.name))
@@ -37,12 +34,24 @@ class Author:
             "name" : self.name,
             "biography" : self.biography,
         }
+    
+    @classmethod
+    def make_author_object(cls, data):
+        """Makes and return the author object from the searialized author data."""
+        author = cls(
+            name=data["name"],
+            id=data["id"],
+            biography=data["biography"]
+        )
+        return author
+
+
 
 
 class Book:
     """Represents a Book in Library"""
 
-    def __init__(self, title, author:Author=None, isbn:str=None, total_copies:int=1 ):
+    def __init__(self, title, author:Author=None, isbn:str=None, total_copies:int=1, available_copies:int=None):
         self.title = title
         self.author = author
         self.isbn = isbn or create_isbn()
@@ -50,7 +59,7 @@ class Book:
         
         if total_copies < 1: raise ValueError("Total copies available in library of a book must be greater than 0.")
         
-        self.available_copies = total_copies
+        self.available_copies = available_copies or total_copies
         self.author.add_book(self)
 
     def __repr__(self):
@@ -73,6 +82,18 @@ class Book:
             "total_copies" : self.total_copies,
             "available_copies" : self.available_copies
         }
+    
+    @classmethod
+    def make_book_object(cls, library, data):
+        """Makes and return the book object from the serialized book data."""
+        book = cls(
+            title = data["title"],
+            author = library.catalog.find_author_by_name(data["author"]),
+            isbn = data["isbn"],
+            total_copies = data["total_copies"],
+            available_copies = data["available_copies"]
+        )
+        return book
     
 class Member:
     "Represents a Member of the Library"
@@ -105,6 +126,18 @@ class Member:
             "current_loans_count" : self.current_loans_count,
         }
     
+    @classmethod
+    def make_member_object(cls, data:dict):
+        """Makes and return the member object from the serialized member data imported from the json."""
+        member = cls(
+            member_id= data["id"],
+            name=data["name"],
+            max_loans=data["max_loans"],
+            current_loans_count = data["current_loans_count"],
+            fine_balance= data["fine_balance"]
+        )
+        return member
+    
 class Loan:
     """Represents a Book Loan issued by a Member of Library"""
 
@@ -133,3 +166,15 @@ class Loan:
             "due_date" : self.due_date.isoformat(),
             "returned_date" : self.returned_date.isoformat()
         }
+    
+    @classmethod
+    def make_loan_object(cls, library, data, member:Member=None):
+        """Makes and return the loan object from the serialized loan data."""
+        loan = cls(
+            book = library.catalog.find_book_by_title(data["book"]),
+            member = member or library.find_member(data["member_id"]),
+            loan_date = datetime.strptime(data["loan_date"], "%Y-%m-%d"),
+            due_date = datetime.strptime(data["due_date"], "%Y-%m-%d"),
+            returned_date = datetime.strptime(data["returned_date"], "%Y-%m-%d")
+        )
+        return loan
