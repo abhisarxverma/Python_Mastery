@@ -21,15 +21,14 @@ class Library:
         import_authors_json(self)
         import_books_json(self)
         import_members_json(self)
-        import_loans_json(self)
-        
+        import_loans_json(self)        
 
     def register_member(self, name):
         """Create a new member and add them to the library's member's set."""
         new_member = Member(name)
         self.members[new_member.member_id] = new_member
-        self.loans[new_member.member_id] = []
-        self.export_members_json(self)
+        self.loans[new_member.member_id] = {}
+        export_members_json(self)
         return new_member
     
     def find_member(self, member_id:str):
@@ -40,15 +39,26 @@ class Library:
     def find_loan(self, member_id:str, book_title:str):
         """Finds and return the loan with the member_id and the book_title return None if not found."""
         member = self.members.get(member_id)
-        if not member: raise ValueError(f"Member with Id {member.member_id} does not exist.")
+        if not member: raise ValueError(f"Member with Id {member_id} does not exist.")
 
-        loan = self.loans[member_id].get(book_title, None)
-        return loan
+        book = self.catalog.find_book_by_title(book_title)
+        if not book: raise ValueError(f"{book_title} is not present in the library.")
+
+        print(self.loans)
+        if self.loans: 
+            loan = self.loans[member_id].get(book.isbn, None)
+            return loan
+        else: return None
     
     def find_author(self, author_id: str):
         """Finds and return the author object from the saved authors."""
         author = self.catalog.authors.get(author_id, None)
         return author
+    
+    def find_book(self, book_isbn: str):
+        """Finds and return the book object from the books."""
+        book = self.catalog.books.get(book_isbn, None)
+        return book
     
     def add_new_book(self, book_title:str, author_name:str, total_copies:int=1 ):
         """Add a new book in library under the Existing author if author exists, else add new author also and then add book under them."""
@@ -62,22 +72,23 @@ class Library:
         
         if not author:
             new_book = Book(book_title, new_author:=Author(author_name), total_copies=total_copies)
-            self.catalog.authors[new_author.id] = author
+            self.catalog.add_author(new_author)
         else:
             new_book = Book(book_title, author=author, total_copies=total_copies)
 
         self.catalog.add_book(new_book)
         export_books_json(self)
+        export_authors_json(self)
         return new_book
     
     def loan_book(self, member_id:str, book_title:str, days:int=None):
         """Create a new loan by the member for the book for given number of days after checking if the member exist with the member_id given and the book exist in the library."""
 
-        book = self.catalog.find_book_by_title(book_title)
-        if not book: raise ValueError(f"{book_title} book is not present in library")
-
         member = self.find_member(member_id) 
         if not member: raise ValueError(f"Member with {member_id} does not exist. Please check once again.")
+
+        book = self.catalog.find_book_by_title(book_title)
+        if not book: raise ValueError(f"{book_title} book is not present in library")
 
         # Book's availability check
         if book.available_copies <= 0 : raise ValueError(f"{book.title} Book is not available currently in library.")
@@ -93,7 +104,7 @@ class Library:
         if duplicate_loan: raise ValueError(f"{member.name}'s already loaned {book.title} on {duplicate_loan.loan_date}.")
 
         self.loans[member.member_id][book.isbn] = new_loan
-        self.export_loans_json(self)
+        export_loans_json(self)
         return new_loan
     
     def return_book(self, member_id:str, book_title:str):
@@ -110,15 +121,15 @@ class Library:
     
     def search_books_by_title(self, search_title:str):
         """Find the books whose title contains the search title query."""
-        return [book for book in self.catalog.books if search_title.lower() in book.title.lower()]
+        return [book for _, book in self.catalog.books.items() if search_title.lower() in book.title.lower()]
     
     def search_books_by_author_name(self, author_name:str):
         """Find the books whose author's name matches the given author name, return empty list if not found."""
-        return [book for book in self.catalog.books if author_name.lower() in book.author.name.lower()]
+        return [book for _, book in self.catalog.books.items() if author_name.lower() in book.author.name.lower()]
     
     def search_authors(self, search_name:str):
         """Find the authors whose name contains the search name query."""
-        return [author for author in self.catalog.authors if search_name.lower() in author.name.lower()]
+        return [author for _, author in self.catalog.authors.items() if search_name.lower() in author.name.lower()]
     
     def get_fine(self, member_id:str):
         """Show the fine of the member by finding the member by member id."""

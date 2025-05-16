@@ -45,9 +45,6 @@ class Author:
         )
         return author
 
-
-
-
 class Book:
     """Represents a Book in Library"""
 
@@ -60,7 +57,6 @@ class Book:
         if total_copies < 1: raise ValueError("Total copies available in library of a book must be greater than 0.")
         
         self.available_copies = available_copies or total_copies
-        self.author.add_book(self)
 
     def __repr__(self):
         return f"Book(Title={self.title!r} Author={self.author.name!r} ISBN={self.isbn!r} Total copies={self.total_copies!r} Copies_available={self.available_copies!r}"
@@ -77,18 +73,17 @@ class Book:
     def serialize(self):
         return {
             "title" : self.title,
-            "author" : self.author.name,
+            "author" : self.author.id,
             "isbn" : self.isbn,
             "total_copies" : self.total_copies,
             "available_copies" : self.available_copies
         }
     
     @classmethod
-    def make_book_object(cls, library, data):
+    def make_book_object(cls, data):
         """Makes and return the book object from the serialized book data."""
         book = cls(
             title = data["title"],
-            author = library.catalog.find_author_by_name(data["author"]),
             isbn = data["isbn"],
             total_copies = data["total_copies"],
             available_copies = data["available_copies"]
@@ -160,18 +155,18 @@ class Loan:
     
     def serialize(self):
         return {
-            "book" : self.book.title,
+            "book" : self.book.isbn,
             "member_id" : self.member.member_id,
             "loan_date" : self.loan_date.isoformat(),
             "due_date" : self.due_date.isoformat(),
-            "returned_date" : self.returned_date.isoformat()
+            "returned_date" : self.returned_date.isoformat() if self.returned_date else "N/A"
         }
     
     @classmethod
     def make_loan_object(cls, library, data, member:Member=None):
         """Makes and return the loan object from the serialized loan data."""
         loan = cls(
-            book = library.catalog.find_book_by_title(data["book"]),
+            book = library.find_book(data["book"]),
             member = member or library.find_member(data["member_id"]),
             loan_date = datetime.strptime(data["loan_date"], "%Y-%m-%d"),
             due_date = datetime.strptime(data["due_date"], "%Y-%m-%d"),

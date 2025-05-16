@@ -47,7 +47,9 @@ def create_author_id(name:str):
 
 def create_loan_id(book_title:str, member_id:str):
     pre = str(sum(ord(c) for c in book_title))
-    core = "".join(random.shuffle(member_id))
+    member_id_list = list(member_id)
+    random.shuffle(member_id_list)
+    core = "".join(member_id_list)
     return pre+core
 
 def log_some_text(text, filepath=LOG_FILE_PATH):

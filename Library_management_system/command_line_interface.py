@@ -105,23 +105,22 @@ def main():
                     break
 
         elif user_choice == 3:
-            while True:
-                member_id = take_general_input("Enter member id : ")
-                book_name = take_general_input("Enter book name: ")
-                try:
-                    days = int(input(f"{MAGENTA}\nEnter number of days for the loan: "))
-                except ValueError as e:
-                    show_error_message("Please enter the number of days.")
-                    continue
-                try:
-                    new_loan = library.loan_book(member_id, book_name, days)
-                except Exception as e:
-                    show_error_message(e)
-                    break
-                else:
-                    show_success_message("Loan approved.")
-                    print(f"{BRIGHT_WHITE}You have to return on {new_loan.due_date}.")
-                    break
+            member_id = take_general_input("Enter member id : ")
+            book_name = take_general_input("Enter book name: ")
+            try:
+                days = int(input(f"{MAGENTA}\nEnter number of days for the loan: "))
+            except ValueError as e:
+                show_error_message("Please enter the number of days.")
+                continue
+            try:
+                new_loan = library.loan_book(member_id, book_name, days)
+            except Exception as e:
+                show_error_message(e)
+                
+            else:
+                show_success_message("Loan approved.")
+                print(f"{BRIGHT_WHITE}You have to return on {new_loan.due_date}.")
+                
             
         elif user_choice == 4:
             while True:

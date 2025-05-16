@@ -24,7 +24,7 @@ def import_loans_json(library, filepath=LOAN_DATA_JSON_PATH):
         
     for member_id, loan_dict in data.items():
         for book_isbn, loan in loan_dict.items():
-            library.loans[member_id][book_isbn] = Loan.make_loan_object(loan)
+            library.loans[member_id][book_isbn] = Loan.make_loan_object(library, loan)
 
     return True
 
@@ -38,7 +38,9 @@ def import_books_json(library, filepath=BOOKS_DATA_JSON_PATH):
     
     for isbn, book_dict in data.items():
         book = Book.make_book_object(book_dict)
+        book.author = library.find_author(book_dict["author"])
         library.catalog.books[isbn] = book
+        library.catalog.total_books += 1
 
     return True
     
@@ -69,34 +71,36 @@ def import_authors_json(library, filepath=AUTHORS_DATA_JSON_PATH):
         with open(filepath, "r") as data_file:
             data = json.load(data_file)
     except json.decoder.JSONDecodeError:
-        return None
+        return False
     
     for _, author_dict in data.items():
         author = Author.make_author_object(author_dict)
         library.catalog.authors[author.id] = author
 
+    return True
+
 def export_members_json(library, filepath=MEMBER_DATA_JSON_PATH):
-        """Export the members data to the json file."""
+    """Export the members data to the json file."""
 
-        serialized_data = {id : member.serialize() for id, member in library.members.items()}
+    serialized_data = {id : member.serialize() for id, member in library.members.items()}
 
-        with open(filepath, "w") as file:
-            json.dump(serialized_data, file, indent=4)
+    with open(filepath, "w") as file:
+        json.dump(serialized_data, file, indent=4)
 
-        return True
+    return True
 
 def import_members_json(library, filepath=MEMBER_DATA_JSON_PATH):
-        """Import the members data from the json file."""
+    """Import the members data from the json file."""
 
-        try:
-            with open(filepath, "r") as file:
-                data = json.load(file)
-        except json.decoder.JSONDecodeError:
-            return False
-                
-        for id, member_data in data.items():
-            member = Member.make_member_object(member_data)
-            library.members[id] = member
-            library.loans[id] = []
+    try:
+        with open(filepath, "r") as file:
+            data = json.load(file)
+    except json.decoder.JSONDecodeError:
+        return False
+            
+    for id, member_data in data.items():
+        member = Member.make_member_object(member_data)
+        library.members[id] = member
+        library.loans[id] = []
 
-        return True
+    return True

@@ -5,10 +5,10 @@ class LibraryCatalog :
     def __init__(self):
         self.books : dict = {}
         self.authors : dict = {}
-        self.total_books = len(self.books)
+        self.total_books = 0
 
     def __repr__(self):
-        return f"Books : {[book.title for book in self.books]}\nAuthors : {[author.name for author in self.authors]}"
+        return f"Books : {[book.title for _, book in self.books.items()]}\nAuthors : {[author.name for _, author in self.authors.items()]}"
 
     def add_book(self, book:Book):
         '''Add book in Library if the book is not already present.'''
