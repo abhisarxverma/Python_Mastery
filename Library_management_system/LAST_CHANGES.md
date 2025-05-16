@@ -2,6 +2,7 @@
 Things I worked on last time.
 
 - Fixed the circular import problem
+- Fixed the feature, that library will automatically get the json data and make and put the objects in itself.
 - Fixed the command line, which has started working
 
 ## NEXT TASKS
