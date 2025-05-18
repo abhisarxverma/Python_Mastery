@@ -1,13 +1,12 @@
 # LAST CHANGES
-Things I worked on last time.
+***Things I worked on last time.***
 
-- Fixed the circular import problem
-- Fixed the feature, that library will automatically get the json data and make and put the objects in itself.
-- Fixed the command line, which has started working
+- Fixed little bugs, and made the command line work 99%.
+- Implemented a feature to let user decide, to save the data or to import the data or to get a fresh library
+- I thought that I had to write whole tests, but little tweeks make the tests works and passed.
+- Completed assignment 5.
 
 ## NEXT TASKS
-Need to do next
+***Need to do next***
 
-- Loans creation and saving is not working, need to make that work
-- I have to fix the loan data export, so that the library system remembers the previous loans of the user
-- Currently I have to make sure that the command line works fully, then I will move for the sixth assignment from the chatGPT, Which will be more harder and will make me learn more.
+- Start assignment 6

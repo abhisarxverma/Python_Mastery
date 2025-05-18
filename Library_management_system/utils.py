@@ -25,20 +25,27 @@ BRIGHT_MAGENTA = "\033[95m"
 BRIGHT_CYAN    = "\033[96m"
 BRIGHT_WHITE   = "\033[97m"
 
-def format_date(date:datetime.date):
-    return date.strftime("%d-%m-%Y")
+def date_to_str(date):
+    if isinstance(date, str):  # Convert string to datetime
+        date = datetime.strptime(date, "%d-%m-%Y").date()
+    
+    return date.strftime("%d-%m-%Y") 
+
+def str_to_date(date: str):
+    return datetime.strptime(date, "%d-%m-%Y")
 
 def create_member_id(member_name):
     return "".join((str(ord(c))[-1]) for c in member_name if c.isalnum())
 
 def compute_due_date( start: date, days : int ):
-    return start + timedelta(days=days)
+    return date.strftime(start + timedelta(days=days), "%d-%m-%Y")
 
-def create_isbn():
+def create_isbn(book_title: str, author_name: str):
     """Generates a random 13-digit ISBN."""
-    prefix = "978"
-    core = "".join(str(random.randint(0, 9)) for _ in range(9))
-    return prefix+core
+    # prefix = "978"
+    mid = "".join(str(ord(c))[1] for c in book_title) 
+    core = "".join(str(ord(c))[1] for c in author_name)
+    return mid+core
 
 def create_author_id(name:str):
     pre = str(sum(ord(c) for c in name))

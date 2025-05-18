@@ -51,7 +51,7 @@ class Book:
     def __init__(self, title, author:Author=None, isbn:str=None, total_copies:int=1, available_copies:int=None):
         self.title = title
         self.author = author
-        self.isbn = isbn or create_isbn()
+        self.isbn = isbn or create_isbn(self.title, author.name)
         self.total_copies = total_copies
         
         if total_copies < 1: raise ValueError("Total copies available in library of a book must be greater than 0.")
@@ -136,12 +136,12 @@ class Member:
 class Loan:
     """Represents a Book Loan issued by a Member of Library"""
 
-    def __init__(self, book:Book, member:Member, loan_date:datetime.date=None, loan_days:int=None, returned_date:datetime.date=None, id: str=None):
+    def __init__(self, book:Book, member:Member, loan_date:datetime.date=None, due_date:datetime.date=None, loan_days:int=None, returned_date:datetime.date=None, id: str=None):
         self.id = id or create_loan_id(book.title, member.member_id)
         self.book: Book = book
         self.member: Member = member
         self.loan_date: date = loan_date or date.today()
-        self.due_date: date = date.today() + timedelta(days=loan_days) if loan_days else compute_due_date(date.today(), DEFAULT_DUE_DAYS)
+        self.due_date: date = due_date or (date.today() + timedelta(days=loan_days) if loan_days else compute_due_date(date.today(), DEFAULT_DUE_DAYS))
         self.returned_date: date = returned_date
 
     def __repr__(self):
@@ -157,9 +157,9 @@ class Loan:
         return {
             "book" : self.book.isbn,
             "member_id" : self.member.member_id,
-            "loan_date" : self.loan_date.isoformat(),
-            "due_date" : self.due_date.isoformat(),
-            "returned_date" : self.returned_date.isoformat() if self.returned_date else "N/A"
+            "loan_date" : date_to_str(self.loan_date),
+            "due_date" : date_to_str(self.due_date),
+            "returned_date" : date_to_str(self.returned_date) if isinstance(self.returned_date, date) else "N/A"
         }
     
     @classmethod
@@ -168,8 +168,8 @@ class Loan:
         loan = cls(
             book = library.find_book(data["book"]),
             member = member or library.find_member(data["member_id"]),
-            loan_date = datetime.strptime(data["loan_date"], "%Y-%m-%d"),
-            due_date = datetime.strptime(data["due_date"], "%Y-%m-%d"),
-            returned_date = datetime.strptime(data["returned_date"], "%Y-%m-%d")
+            loan_date = str_to_date(data["loan_date"]),
+            due_date = str_to_date(data["due_date"]),
+            returned_date = str_to_date(data["returned_date"]) if data["returned_date"] != "N/A" else "N/A"
         )
         return loan

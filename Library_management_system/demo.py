@@ -1,9 +1,9 @@
 from models import *
 from services import LoanService
 from library import Library
-import json
+from data_import_export import *
 
-library = Library()
+library = Library(False, False)
 print(library.catalog)
 
 # Book 1
@@ -29,18 +29,12 @@ print(book1)
 loan2_member1 = library.loan_book(member1.member_id, "the pragmatic programmer", 10)
 print(loan2_member1)
 
-# Member1 all loans
-print(member1.current_loans)
-
 # Return of loan 1 of member 1
 if library.return_book(member1.member_id, "show your work") : print("Return successful!")
 else : print(f"Return failed!")
 
 # Let's check the book copies available by searching the book by title in catalog
 print(book1 := library.catalog.find_book_by_title("show your work"))
-
-# Now let's check the member 1's current loans
-print(member1.current_loans)
 
 # Let's create some more books
 book3 = library.add_new_book("Keep Going", "Austin Kleon")
@@ -68,12 +62,12 @@ it = Book("IT", stephen_king)
 it_chapter2 = Book("IT-2", stephen_king)
 in_a_tall_grass = Book("In a Tall Grass", stephen_king)
 
-for book in stephen_king.books:
-    print(book)
-
-# Let's try to export the library catalog data
-library.catalog.export_to_json("exported_data.json")
-
-# Let's try to import the library catalog data
-data = library.catalog.import_from_json("exported_data.json")
-print(data)
+current_datetime = date.today()
+# Subtract 2 days
+two_days_before = current_datetime - timedelta(days=2)
+past_loan = Loan(book3, member1, due_date=two_days_before)
+print(past_loan)
+print(past_loan.due_date)
+print(library.get_fine(member1.member_id))
+print(library.loan_service.calculate_penalty(past_loan))
+print(member1.fine_balance)

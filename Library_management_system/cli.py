@@ -1,5 +1,4 @@
 # Command line Interface Implementation for the Library management system
-from models import Book, Author, Loan, Member
 from library import Library
 from utils import *
 
@@ -15,19 +14,19 @@ def check_minimum_length(string):
 
 def get_validated_input(prompt, validation_fn, error_message):
     while True:
-        value = input(f"{INPUT_COLOR}\n{prompt}")
+        value = input(f"{INPUT_COLOR}\n{prompt}{WHITE}")
         if validation_fn(value):
             return value
-        print(f"{RED}\n{error_message}")
+        print(f"{RED}\n{error_message}{WHITE}")
 
 def show_success_message(message):
-    print(f"{GREEN}\n{message}")
+    print(f"{GREEN}\n{message}{WHITE}")
 
 def show_error_message(message):
-    print(f"{RED}\nError occured : {message}")
+    print(f"{RED}\nError occured : {message}{WHITE}")
 
 def take_general_input(prompt, color=None):
-    user_input = input(f"{color or INPUT_COLOR}\n{prompt}")
+    user_input = input(f"{color or INPUT_COLOR}\n{prompt}{WHITE}")
     return user_input
 
 def print_book_search_result(result):
@@ -35,11 +34,11 @@ def print_book_search_result(result):
     for book in result: print(book)
 
 def show_general_message(message):
-    print(f"{BRIGHT_WHITE}\n{message}")
+    print(f"{BRIGHT_WHITE}\n{message}{WHITE}")
 
 def take_int_input(message):
     try:
-        user_input = int(input(f"\n{INPUT_COLOR}{message}"))
+        user_input = int(input(f"\n{INPUT_COLOR}{message}{WHITE}"))
         return user_input
     except ValueError as e:
         print(e)
@@ -62,7 +61,7 @@ def main():
     """)
         
         try:    
-            user_choice = int(input(f"{YELLOW}Enter your choice> "))
+            user_choice = int(input(f"{YELLOW}Enter your choice> {WHITE}"))
         except ValueError as e:
             print(f"{RED}Please enter valid choice.")
             continue

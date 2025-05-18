@@ -1,4 +1,5 @@
 from models import *
+import utils
 from catalog import LibraryCatalog
 from services import LoanService
 from data_import_export import *
@@ -11,24 +12,27 @@ AUTHORS_DATA_JSON_PATH = "data/authors.json"
 
 class Library:
 
-    def __init__(self):
+    def __init__(self, to_import: bool=True, to_save_data: bool=True):
         self.loans : dict = {}
         self.members : dict = {}
         self.catalog = LibraryCatalog()
         self.loan_service = LoanService()
+        self.to_import = to_import
+        self.to_save_data = to_save_data
 
-        #import data from json
-        import_authors_json(self)
-        import_books_json(self)
-        import_members_json(self)
-        import_loans_json(self)        
+        #import data from json if the user wants
+        if to_import:
+            import_authors_json(self)
+            import_books_json(self)
+            import_members_json(self)
+            import_loans_json(self)        
 
     def register_member(self, name):
         """Create a new member and add them to the library's member's set."""
         new_member = Member(name)
         self.members[new_member.member_id] = new_member
         self.loans[new_member.member_id] = {}
-        export_members_json(self)
+        if self.to_save_data: export_members_json(self)
         return new_member
     
     def find_member(self, member_id:str):
@@ -44,7 +48,6 @@ class Library:
         book = self.catalog.find_book_by_title(book_title)
         if not book: raise ValueError(f"{book_title} is not present in the library.")
 
-        print(self.loans)
         if self.loans: 
             loan = self.loans[member_id].get(book.isbn, None)
             return loan
@@ -64,9 +67,8 @@ class Library:
         """Add a new book in library under the Existing author if author exists, else add new author also and then add book under them."""
 
         # check if the book with the same name and the same author exists
-        for book in self.catalog.books:
-            if book.title == book_title and book.author.name == author_name:
-                raise ValueError(f"Book with title {book_title} and Author {author_name} already exists.")
+        if self.find_book(utils.create_isbn(book_title, author_name)):
+            raise ValueError(f"Book with title {book_title} and Author {author_name} already exists.")
 
         author = self.catalog.find_author_by_name(author_name)
         
@@ -77,8 +79,8 @@ class Library:
             new_book = Book(book_title, author=author, total_copies=total_copies)
 
         self.catalog.add_book(new_book)
-        export_books_json(self)
-        export_authors_json(self)
+        if self.to_save_data : export_books_json(self)
+        if self.to_save_data : export_authors_json(self)
         return new_book
     
     def loan_book(self, member_id:str, book_title:str, days:int=None):
@@ -104,7 +106,7 @@ class Library:
         if duplicate_loan: raise ValueError(f"{member.name}'s already loaned {book.title} on {duplicate_loan.loan_date}.")
 
         self.loans[member.member_id][book.isbn] = new_loan
-        export_loans_json(self)
+        if self.to_save_data: export_loans_json(self)
         return new_loan
     
     def return_book(self, member_id:str, book_title:str):
@@ -117,6 +119,8 @@ class Library:
             loan.member.fine_balance += fine
 
         self.loan_service.return_loan(loan)
+        self.loans[member_id].pop(loan.book.isbn)
+        if self.to_save_data: export_loans_json(self)
         return True
     
     def search_books_by_title(self, search_title:str):

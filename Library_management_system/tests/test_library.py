@@ -2,13 +2,13 @@
 
 import pytest
 from datetime import datetime, timedelta, date
-from models import Book, Member
+from models import *
 from services import LoanService
 from library import Library
 
 @pytest.fixture
 def library():
-    return Library()
+    return Library(to_import=False, to_save_data=False)
 
 def test_add_new_books(library):
     book1 = library.add_new_book("Show your work", "Austin Kleon", 5)
@@ -73,3 +73,12 @@ def test_search_authors(library):
 def test_add_already_existing_book(library):
     library.add_new_book("Build Don't talk", "Raj Shamani", 3)
     with pytest.raises(ValueError) : library.add_new_book("Build Don't talk", "Raj Shamani", 3)
+
+def test_fine_for_member(library):
+    book = library.add_new_book("The Magic of Thinking Big", "Phraser McGurg", 10)
+    member = library.register_member("John Doe")
+    current_datetime = date.today()
+    two_days_before = current_datetime - timedelta(days=2)
+    past_loan = Loan(book, member, due_date=two_days_before)
+    fine = library.loan_service.calculate_penalty(past_loan)
+    assert fine == 10

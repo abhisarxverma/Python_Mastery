@@ -11,7 +11,7 @@ def export_loans_json(library, filepath=LOAN_DATA_JSON_PATH):
     """Exports the existing loans data in library to json."""
     serialized_data = {member_id : {isbn : loan.serialize() for isbn, loan in loan_dict.items()} for member_id, loan_dict in library.loans.items()}
     with open(filepath, "w") as file:
-        json.dump(serialized_data, file)
+        json.dump(serialized_data, file, indent=4)
     return True
 
 def import_loans_json(library, filepath=LOAN_DATA_JSON_PATH):
@@ -101,6 +101,6 @@ def import_members_json(library, filepath=MEMBER_DATA_JSON_PATH):
     for id, member_data in data.items():
         member = Member.make_member_object(member_data)
         library.members[id] = member
-        library.loans[id] = []
+        library.loans[id] = {}
 
     return True
