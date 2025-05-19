@@ -1,6 +1,8 @@
 # Command line Interface Implementation for the Library management system
 from library import Library
 from utils import *
+from models import *
+from typing import List
 
 BASE_COLOR = BRIGHT_CYAN
 INPUT_COLOR = MAGENTA
@@ -23,7 +25,7 @@ def show_success_message(message):
     print(f"{GREEN}\n{message}{WHITE}")
 
 def show_error_message(message):
-    print(f"{RED}\nError occured : {message}{WHITE}")
+    print(f"{RED}\n{message}{WHITE}")
 
 def take_general_input(prompt, color=None):
     user_input = input(f"{color or INPUT_COLOR}\n{prompt}{WHITE}")
@@ -41,16 +43,18 @@ def take_int_input(message):
         user_input = int(input(f"\n{INPUT_COLOR}{message}{WHITE}"))
         return user_input
     except ValueError as e:
-        print(e)
         return None
 
-
-def main():
-
+def welcome_message():
     print(f"{BASE_COLOR}Welcome to the Library Management System.\n")
-    while True:
-        print(f"\n{BASE_COLOR}Enter operation : \n")
-        print("""1 - Register Member
+
+def goodbye_message():
+    print(f"Thank you for using the system. Good bye, take care!😄")
+    print("Shutting down....")
+
+def print_member_interface_options():
+    print(f"\n{BASE_COLOR}Enter Operation Mr.member : \n")
+    print("""1 - Register Member
 2 - Add Book
 3 - Loan Book
 4 - Return Book
@@ -59,12 +63,51 @@ def main():
 (0 - Exit)
 
     """)
+
+def print_admin_interface_options():
+    print(f"\n{BASE_COLOR}Enter Command Mr.Admin")
+    print("""
+1. View total number of books
+2. View currently loaned books
+3. View overdue books and defaulters
+4. View total fine collected
+5. Search Member by ID
+6. Export Library Report (Optional)
+7. Back to Main Menu
+          """)
+    
+def print_loan_summary(loan: Loan):
+
+    due_days = 0
+    if date.today() > loan.due_date:
+        due_days = date.today() - loan.due_date
+
+    print(f""""{loan.book.title}"
+Borrowed by : {loan.member.member_id} ({loan.member.name})
+Borrowed on : {loan.loan_date}
+Due Date    : {loan.due_date}
+Status      : {f"{RED}❗ Overdue by {due_days} days{YELLOW}" if due_days else f"{GREEN}⏳ On Time{YELLOW}"}
+    """)
+
+def show_currently_loaned_books(loans : List[Loan]):
+    if not loans:
+        show_general_message("No Loans currently pending.")
+        return
+
+    total_loans = len(loans)
+    print(f"{YELLOW}Currently Loaned Books (Total : {total_loans})")
+
+    for number, loan in enumerate(loans, start=1):
+        print(f"{number}.", end="")
+        print_loan_summary(loan)
+        print("-"*20)
+
+          
+def member_interface():
+    while True:
+        print_member_interface_options()
         
-        try:    
-            user_choice = int(input(f"{YELLOW}Enter your choice> {WHITE}"))
-        except ValueError as e:
-            print(f"{RED}Please enter valid choice.")
-            continue
+        user_choice = take_int_input(f"{YELLOW}Enter your choice> {WHITE}")
 
         if user_choice == 1:
             while True:
@@ -183,12 +226,43 @@ def main():
                 show_error_message(e)
 
         elif user_choice == 0:
-            print(f"Thank you for using the system. Good bye, take care!😄")
-            print("Shutting down....")
+            goodbye_message()
             break
 
         else:
             print(f"{RED}\nInvalid choice.")
+
+def admin_interface() :
+    show_general_message("\nADMIN DASHBOARD\n")
+
+    while True:
+        print_admin_interface_options()
+        
+        admin_command = take_int_input("Enter Command : ")
+
+        if admin_command == 1:
+            total_books = library.get_total_books()
+            show_general_message(f"TOTAL BOOKS IN LIBRARY : {total_books}")
+            
+        if admin_command == 2:
+            loaned_books = library.get_currently_loaned_books()
+            show_currently_loaned_books(loaned_books)
+
+
+def main():
+    welcome_message()
+
+    while True:
+        user_type = take_general_input("Are you:\n\n1. Admin\n2. Member\n\nType here : ", color=WHITE)
+        if user_type == "1" or user_type.lower() == "admin":
+            admin_interface()
+        
+        elif user_type == "2" or user_type.lower() == "member":
+            member_interface()
+
+        else: 
+            show_error_message("Invalid Input.")
+
 
 if __name__ == "__main__":
     main()

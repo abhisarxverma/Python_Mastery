@@ -1,12 +1,12 @@
 # LAST CHANGES
 ***Things I worked on last time.***
 
-- Fixed little bugs, and made the command line work 99%.
-- Implemented a feature to let user decide, to save the data or to import the data or to get a fresh library
-- I thought that I had to write whole tests, but little tweeks make the tests works and passed.
-- Completed assignment 5.
+- Started making admin command line interface
+- Implemented the total books and show currently loaned books features in the admin command line
 
 ## NEXT TASKS
 ***Need to do next***
 
-- Start assignment 6
+- Need to implement more features in the admin command line interface
+- Need to write the command line interface code more cleanly and efficiently
+- Remember to work with the DRY principle and the Orthogonality. 

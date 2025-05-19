@@ -32,13 +32,13 @@ def date_to_str(date):
     return date.strftime("%d-%m-%Y") 
 
 def str_to_date(date: str):
-    return datetime.strptime(date, "%d-%m-%Y")
+    return datetime.strptime(date, "%d-%m-%Y").date()
 
 def create_member_id(member_name):
     return "".join((str(ord(c))[-1]) for c in member_name if c.isalnum())
 
 def compute_due_date( start: date, days : int ):
-    return date.strftime(start + timedelta(days=days), "%d-%m-%Y")
+    return start + timedelta(days=days)
 
 def create_isbn(book_title: str, author_name: str):
     """Generates a random 13-digit ISBN."""

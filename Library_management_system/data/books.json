@@ -5,5 +5,33 @@
         "isbn": "610002811912170027023070710",
         "total_copies": 3,
         "available_copies": 3
+    },
+    "1011221112111071101200011": {
+        "title": "show your work",
+        "author": "111491111311111",
+        "isbn": "1011221112111071101200011",
+        "total_copies": 10,
+        "available_copies": 10
+    },
+    "11070200002712711011711101200011": {
+        "title": "steal like an artist",
+        "author": "1229911111311111",
+        "isbn": "11070200002712711011711101200011",
+        "total_copies": 50,
+        "available_copies": 50
+    },
+    "05593211070200002712711011": {
+        "title": "277154",
+        "author": "192411191311113913911111",
+        "isbn": "05593211070200002712711011",
+        "total_copies": 10,
+        "available_copies": 10
+    },
+    "40010271020111210908711001122000": {
+        "title": "Think and grow rich",
+        "author": "12537911111137111",
+        "isbn": "40010271020111210908711001122000",
+        "total_copies": 50,
+        "available_copies": 50
     }
 }

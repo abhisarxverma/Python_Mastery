@@ -66,8 +66,5 @@ current_datetime = date.today()
 # Subtract 2 days
 two_days_before = current_datetime - timedelta(days=2)
 past_loan = Loan(book3, member1, due_date=two_days_before)
-print(past_loan)
-print(past_loan.due_date)
-print(library.get_fine(member1.member_id))
-print(library.loan_service.calculate_penalty(past_loan))
-print(member1.fine_balance)
+library.loans[member1.member_id][book3.isbn] = past_loan
+export_loans_json(library)
