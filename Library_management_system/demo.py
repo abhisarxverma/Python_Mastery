@@ -68,3 +68,10 @@ two_days_before = current_datetime - timedelta(days=2)
 past_loan = Loan(book3, member1, due_date=two_days_before)
 library.loans[member1.member_id][book3.isbn] = past_loan
 export_loans_json(library)
+
+import logging
+
+logging.basicConfig(filename="app.log", level=logging.INFO, format=f"[%(asctime)s - %(levelname)s - %(message)s]")
+
+logging.info("User logged in")
+logging.error("File not found: config.yaml")

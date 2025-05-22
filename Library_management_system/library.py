@@ -3,12 +3,22 @@ import utils
 from catalog import LibraryCatalog
 from services import LoanService
 from data_import_export import *
+import logging
 
+logging.basicConfig(filename="app.log", level=logging.INFO, format="%(asctime)s - %(message)s")
+
+def log_new_loan(library: "Library", loan: Loan):
+    logging.info(f'Member ID {loan.member.member_id} borrowed "{loan.book.title}" | Due {loan.due_date} | Fine Paid : Rs.0')
+
+def log_loan_return(library: "Library", loan: Loan):
+    fine = library.loan_service.calculate_penalty(loan)
+    logging.info(f'Member ID {loan.member.member_id} returned "{loan.book.title}" | Fine Paid Rs.{fine}')
 
 MEMBER_DATA_JSON_PATH = "data/members.json"
 LOAN_DATA_JSON_PATH = "data/loans.json"
 BOOKS_DATA_JSON_PATH = "data/books.json"
 AUTHORS_DATA_JSON_PATH = "data/authors.json"
+LIBRARY_DATA_JSON_PATH = "data/library.json"
 
 class Library:
 
@@ -19,8 +29,9 @@ class Library:
         self.loan_service = LoanService()
         self.to_import = to_import
         self.to_save_data = to_save_data
+        self.total_fine_collected = 0
 
-        #import data from json if the user wants
+        #import data from json if the program runner wants
         if to_import:
             import_authors_json(self)
             import_books_json(self)
@@ -113,6 +124,10 @@ class Library:
 
         self.loans[member.member_id][book.isbn] = new_loan
         if self.to_save_data: export_loans_json(self)
+
+        print("Error in logging.")
+        log_new_loan(self, new_loan)
+
         return new_loan
     
     def return_book(self, member_id:str, book_title:str):
@@ -121,12 +136,22 @@ class Library:
         loan = self.find_loan(member_id, book_title)
         if not loan: raise ValueError(f"No loan exist by Member with id {member_id} for book {book_title}")
 
+        member = self.find_member(member_id)
+
+        # Assuming that the member will pay the fine of the current book when he will return the book
         if fine := self.loan_service.calculate_penalty(loan):
-            loan.member.fine_balance += fine
+            self.total_fine_collected += fine
+            member.fine_balance -= fine
 
         self.loan_service.return_loan(loan)
         self.loans[member_id].pop(loan.book.isbn)
         if self.to_save_data: export_loans_json(self)
+        if self.to_save_data: export_members_json(self)
+        if self.to_save_data: self.save_library_data()
+
+        print("Error in logging")
+        log_loan_return(self, loan)
+
         return True
     
     def search_books_by_title(self, search_title:str):
@@ -152,26 +177,54 @@ class Library:
         fine = member.fine_balance
         return fine
     
-    def pay_fine(self, member_id:str, amount: int):
-        """Pay Fine by finding the member by member id and subtracting the amount paid from the member's fine balance."""
+    # def pay_fine(self, member_id:str, amount: int):
+    #     """Pay Fine by finding the member by member id and subtracting the amount paid from the member's fine balance."""
 
-        member = self.find_member(member_id)
-        if not member: raise ValueError(f"Invalid Member id : {member_id}. Please recheck.")
-        member.fine_balance -= amount
-        return True
+    #     member = self.find_member(member_id)
+    #     if not member: raise ValueError(f"Invalid Member id : {member_id}. Please recheck.")
+    #     member.fine_balance -= amount
+    #     self.total_fine_collected += amount
+    #     self.save_library_data()
+    #     if self.to_save_data: export_members_json(self)
+    #     return True
     
     def get_total_books(self):
         """Returns the total books in the library catalog"""
 
         return self.catalog.total_books
     
-    def get_currently_loaned_books(self):
+    def get_currently_loaned_books(self, filter=None):
         """Returns the list of the books that are currently loaned by any member in list format, returns empty list in case of no books loaned."""
 
         loaned_books = []
 
         for member_id, loans in self.loans.items():
             for book_isbn, loan in loans.items():
-                loaned_books.append(loan)
+                if filter == "overdue" :
+                    if self.loan_service.is_overdue(loan):
+                        loaned_books.append(loan)
+                else:
+                    loaned_books.append(loan)
 
         return loaned_books
+
+    def save_library_data(self, filepath=LIBRARY_DATA_JSON_PATH):
+        with open(filepath, "w") as file:
+            data = {
+                "Total Fine collected" : self.total_fine_collected,
+                "Total Books" : self.catalog.total_books,
+                "Total Members" : len(self.members),
+                "Total Staff" : 10
+            }
+            json.dump(data, file, indent=4)
+
+        return True
+    
+    def get_all_loans_of_member(self, member_id: str) -> list:
+        """Finds and return all the current loans of the member with the given member id."""
+        member_loans = []
+        loan_dict = self.loans[member_id]
+        for book_isbn, loan in loan_dict.items():
+            member_loans.append(loan)
+
+        return member_loans

@@ -24,7 +24,11 @@ def import_loans_json(library, filepath=LOAN_DATA_JSON_PATH):
         
     for member_id, loan_dict in data.items():
         for book_isbn, loan in loan_dict.items():
-            library.loans[member_id][book_isbn] = Loan.make_loan_object(library, loan)
+            loan = Loan.make_loan_object(library, loan)
+            library.loans[member_id][book_isbn] = loan
+            loan.member.fine_balance += library.loan_service.calculate_penalty(loan)
+        
+    export_members_json(library)
 
     return True
 
@@ -100,6 +104,7 @@ def import_members_json(library, filepath=MEMBER_DATA_JSON_PATH):
             
     for id, member_data in data.items():
         member = Member.make_member_object(member_data)
+        member.fine_balance = 0
         library.members[id] = member
         library.loans[id] = {}
 
