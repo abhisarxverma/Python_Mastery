@@ -1,11 +1,14 @@
-from models import *
-import utils
-from catalog import LibraryCatalog
-from services import LoanService
-from data_import_export import *
+from .models.book import Book, Author
+from .models.loan import Loan
+from .models.member import Member
+from .catalog import LibraryCatalog
+from .services import LoanService
+from .data_import_export import *
 import logging
 
-logging.basicConfig(filename="app.log", level=logging.INFO, format="%(asctime)s - %(message)s")
+logging_file = give_absolute_path("Log/app.log")
+
+logging.basicConfig(filename=logging_file, level=logging.INFO, format="%(asctime)s - %(message)s")
 
 def log_new_loan(library: "Library", loan: Loan):
     logging.info(f'Member ID {loan.member.member_id} borrowed "{loan.book.title}" | Due {loan.due_date} | Fine Paid : Rs.0')
@@ -14,11 +17,7 @@ def log_loan_return(library: "Library", loan: Loan):
     fine = library.loan_service.calculate_penalty(loan)
     logging.info(f'Member ID {loan.member.member_id} returned "{loan.book.title}" | Fine Paid Rs.{fine}')
 
-MEMBER_DATA_JSON_PATH = "data/members.json"
-LOAN_DATA_JSON_PATH = "data/loans.json"
-BOOKS_DATA_JSON_PATH = "data/books.json"
-AUTHORS_DATA_JSON_PATH = "data/authors.json"
-LIBRARY_DATA_JSON_PATH = "data/library.json"
+LIBRARY_DATA_JSON_PATH = give_absolute_path("data/library.json")
 
 class Library:
 
@@ -98,6 +97,8 @@ class Library:
         self.catalog.add_book(new_book)
         if self.to_save_data : export_books_json(self)
         if self.to_save_data : export_authors_json(self)
+        if self.to_save_data : self.catalog.total_books += 1
+        if self.to_save_data : self.save_library_data()
         return new_book
     
     def loan_book(self, member_id:str, book_title:str, days:int=None):

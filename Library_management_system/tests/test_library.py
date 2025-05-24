@@ -2,7 +2,7 @@
 
 import pytest
 from datetime import datetime, timedelta, date
-from models import *
+from Library_management_system.models.models import *
 from services import LoanService
 from library import Library
 

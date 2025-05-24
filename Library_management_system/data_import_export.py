@@ -1,11 +1,13 @@
 import json
-from models import *
-from utils import *
+from .models.book import Book, Author
+from .models.loan import Loan
+from .models.member import Member
+from .utils import *
 
-LOAN_DATA_JSON_PATH = "data/loans.json"
-BOOKS_DATA_JSON_PATH = "data/books.json"
-AUTHORS_DATA_JSON_PATH = "data/authors.json"
-MEMBER_DATA_JSON_PATH = "data/members.json"
+LOAN_DATA_JSON_PATH = give_absolute_path("data/loans.json")
+BOOKS_DATA_JSON_PATH = give_absolute_path("data/books.json")
+AUTHORS_DATA_JSON_PATH = give_absolute_path("data/authors.json")
+MEMBER_DATA_JSON_PATH = give_absolute_path("data/members.json")
 
 def export_loans_json(library, filepath=LOAN_DATA_JSON_PATH):
     """Exports the existing loans data in library to json."""

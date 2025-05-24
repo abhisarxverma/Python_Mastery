@@ -1,4 +1,6 @@
-from models import *
+from .models.book import Book, Author
+from .models.loan import Loan
+from .models.member import Member
 from datetime import datetime, date
 
 class LoanService:

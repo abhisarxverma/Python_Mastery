@@ -2,28 +2,14 @@
 
 from datetime import datetime, date, timedelta
 import random
+import os
 
 LOG_FILE_PATH = "log.txt"
 
-BLACK   = "\033[30m"
-RED     = "\033[31m"
-GREEN   = "\033[32m"
-YELLOW  = "\033[33m"
-BLUE    = "\033[34m"
-MAGENTA = "\033[35m"
-CYAN    = "\033[36m"
-WHITE   = "\033[37m"
-RESET   = "\033[0m" 
-BOLD      = "\033[1m"
-UNDERLINE = "\033[4m"
-BRIGHT_BLACK   = "\033[90m"
-BRIGHT_RED     = "\033[91m"
-BRIGHT_GREEN   = "\033[92m"
-BRIGHT_YELLOW  = "\033[93m"
-BRIGHT_BLUE    = "\033[94m"
-BRIGHT_MAGENTA = "\033[95m"
-BRIGHT_CYAN    = "\033[96m"
-BRIGHT_WHITE   = "\033[97m"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+def give_absolute_path(path):
+    return os.path.join(BASE_DIR, path)
 
 def date_to_str(date):
     if isinstance(date, str):  # Convert string to datetime

@@ -19,5 +19,26 @@
         "isbn": "10701121071001001210100",
         "total_copies": 8,
         "available_copies": 8
+    },
+    "4002211001070011101027121070": {
+        "title": "The Hungergames",
+        "author": "13221111138111191",
+        "isbn": "4002211001070011101027121070",
+        "total_copies": 2,
+        "available_copies": 2
+    },
+    "40020710210010278111207102100101071207102": {
+        "title": "The hard thing about hard things",
+        "author": "890191319111",
+        "isbn": "40020710210010278111207102100101071207102",
+        "total_copies": 8,
+        "available_copies": 8
+    },
+    "0110210121100200120011710118012107107": {
+        "title": "monk who sold his ferrari",
+        "author": "1206119113119119",
+        "isbn": "0110210121100200120011710118012107107",
+        "total_copies": 8,
+        "available_copies": 8
     }
 }
