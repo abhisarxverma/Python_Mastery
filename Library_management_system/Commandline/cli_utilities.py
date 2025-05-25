@@ -91,8 +91,16 @@ def print_admin_interface_options():
 4. View total fine collected
 5. Search Member by ID
 6. Export Library Report (Optional)
-7. Back to Main Menu
+7. Open Analysis Interface
+8. Back to Main Menu
           """)
+    
+def print_analysis_interface_options():
+    print(f"\n{BASE_COLOR}📊 Analysis Panel : ")
+    print("""
+1. Most Borrowed Books
+0. Back to Admin Interface
+""")
     
 def print_loan_summary(loan: Loan):
 
@@ -131,3 +139,9 @@ Current loans count : {member.current_loans_count}
     
     loans = library.get_all_loans_of_member(member.member_id)
     show_loaned_books(loans)
+
+def print_n_most_borrowed_books(result : list, n : int):
+    print(f"\n{GREEN}Top {n} most borrowed books - \n")
+    for book in result:
+        print(book)
+    print(f"{BASE_COLOR}")

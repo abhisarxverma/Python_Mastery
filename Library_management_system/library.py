@@ -4,6 +4,7 @@ from .models.member import Member
 from .catalog import LibraryCatalog
 from .services import LoanService
 from .data_import_export import *
+from .analytics_engine import AnalyticsEngine
 import logging
 
 logging_file = give_absolute_path("Log/app.log")
@@ -35,7 +36,9 @@ class Library:
             import_authors_json(self)
             import_books_json(self)
             import_members_json(self)
-            import_loans_json(self)        
+            import_loans_json(self)   
+     
+        self.analytics_engine = AnalyticsEngine(self)
 
     def register_member(self, name):
         """Create a new member and add them to the library's member's set."""
@@ -126,8 +129,9 @@ class Library:
         self.loans[member.member_id][book.isbn] = new_loan
         if self.to_save_data: export_loans_json(self)
 
-        print("Error in logging.")
         log_new_loan(self, new_loan)
+
+        self.analytics_engine.update_data(new_loan)
 
         return new_loan
     
@@ -178,17 +182,6 @@ class Library:
         fine = member.fine_balance
         return fine
     
-    # def pay_fine(self, member_id:str, amount: int):
-    #     """Pay Fine by finding the member by member id and subtracting the amount paid from the member's fine balance."""
-
-    #     member = self.find_member(member_id)
-    #     if not member: raise ValueError(f"Invalid Member id : {member_id}. Please recheck.")
-    #     member.fine_balance -= amount
-    #     self.total_fine_collected += amount
-    #     self.save_library_data()
-    #     if self.to_save_data: export_members_json(self)
-    #     return True
-    
     def get_total_books(self):
         """Returns the total books in the library catalog"""
 
@@ -225,7 +218,7 @@ class Library:
         """Finds and return all the current loans of the member with the given member id."""
         member_loans = []
         loan_dict = self.loans[member_id]
-        for book_isbn, loan in loan_dict.items():
+        for _, loan in loan_dict.items():
             member_loans.append(loan)
 
         return member_loans

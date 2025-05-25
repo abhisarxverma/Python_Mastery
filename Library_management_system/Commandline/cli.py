@@ -26,4 +26,8 @@ def main():
             show_error_message("Invalid Input.")
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\n")
+        goodbye_message()
