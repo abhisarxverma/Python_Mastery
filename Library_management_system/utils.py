@@ -3,6 +3,7 @@
 from datetime import datetime, date, timedelta
 import random
 import os
+import traceback
 
 LOG_FILE_PATH = "log.txt"
 
@@ -48,3 +49,12 @@ def create_loan_id(book_title:str, member_id:str):
 def log_some_text(text, filepath=LOG_FILE_PATH):
     with open(filepath, "w") as file:
         file.write(text)
+
+def raise_error(class_name: str, message: str):
+    try:
+        raise ValueError()
+    except Exception:
+        stack_trace = traceback.extract_stack()
+
+    caller = stack_trace[-2].name
+    raise ValueError(f"{class_name} : {caller} : {message}")
