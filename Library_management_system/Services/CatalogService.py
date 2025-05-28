@@ -11,9 +11,16 @@ class CatalogService :
     def __repr__(self):
         return f"Books : {[book.title for _, book in self.books.items()]}\nAuthors : {[author.name for _, author in self.authors.items()]}"
 
+    def all_books(self):
+        return self.books.items()
+    
+    def all_authors(self):
+        return self.authors.items()
+
     def add_book(self, book:Book) -> None:
         '''Add book in Library if the book is not already present.'''
-        
+        self.books[book.isbn] = book
+        self.total_books += 1
 
     def remove_book(self, book:Book) -> None:
         '''Remove book from Library if the book is present in Library.'''
@@ -75,3 +82,7 @@ class CatalogService :
         self.total_books += 1
         
         return new_book
+    
+    def add_imported_book(self, book: Book, author_id: str):
+        book.author = self.find_author_by_id(author_id)
+        self.add_book(book)

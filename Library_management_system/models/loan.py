@@ -1,6 +1,8 @@
 from ..utils import *
 from .book import Book, Author
 from .member import Member
+from ..Services.MemberService import MemberService
+from ..Services.CatalogService import CatalogService
 
 from datetime import datetime, timedelta, date
 
@@ -36,11 +38,11 @@ class Loan:
         }
     
     @classmethod
-    def make_loan_object(cls, library, data, member:Member=None):
+    def make_loan_object(cls, catalog_service:CatalogService, member_service:MemberService, data, member:Member=None):
         """Makes and return the loan object from the serialized loan data."""
         loan = cls(
-            book = library.find_book(data["book"]),
-            member = member or library.find_member(data["member_id"]),
+            book = catalog_service.find_book(data["book"]),
+            member = member or member_service.find_member(data["member_id"]),
             loan_date = str_to_date(data["loan_date"]),
             due_date = str_to_date(data["due_date"]),
             returned_date = str_to_date(data["returned_date"]) if data["returned_date"] != "N/A" else "N/A"
