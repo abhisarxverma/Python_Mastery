@@ -4,16 +4,18 @@ from ..models.member import Member
 from datetime import date
 from MemberService import MemberService
 from CatalogService import CatalogService
+from PenaltyService import PenaltyService
 from utils import raise_error
 
 CLASSNAME = "LOANSERVICE"
 
 class LoanService:
 
-    def __init__(self, member_service: MemberService, catalog_service: CatalogService):
+    def __init__(self, member_service: MemberService, catalog_service: CatalogService, penalty_service: PenaltyService):
         self.pending_loans = {}
         self.member_service = member_service
         self.catalog_service = catalog_service
+        self.penalty_service = penalty_service
 
     def all_loans(self):
         return self.pending_loans.items()
@@ -72,27 +74,29 @@ class LoanService:
         member.current_loans_count += 1
 
         return new_loan
-        
     
-    def return_loan(self, loan:Loan):
-        """End the loan by removing the loan from the member's current loans and incrementing the book copies availble."""
+    def return_book(self, member_id:str, book_title:str, author_name:str):
+        """Return book, by finding the loan of the member in which the book corresponds to the book_title given."""
+
+        book = self.catalog_service.find_book_by_author_name(book_title, author_name)
+        if not book: raise_error(CLASSNAME, f"Book with title {book_title} and author {author_name} does not exist.")
+
+        loan = self.find_loan(member_id, book_isbn=book.isbn)
+        if not loan: raise_error(CLASSNAME, f"No loan exist by Member with id {member_id} for book {book_title}")
+
+        member = self.member_service.find_member(member_id)
+
+        # Assuming that the member will pay the fine of the current book when he will return the book
+        if fine := self.penalty_service.calculate_penalty(loan):
+            self.total_fine_collected += fine
+            member.fine_balance -= fine
 
         loan.returned_date = date.today()
         loan.book.available_copies += 1
-
-        return True
-    
-    def is_overdue(self, loan:Loan):
-        """Return True if today's date is more than the due_date of the loan, else return False."""
+        self.pending_loans[member_id].pop(loan.book.isbn)
         
-        if date.today() > loan.due_date: return True
-        else : return False
-
-    def calculate_penalty(self, loan: Loan) -> float:
-        if self.is_overdue(loan):
-            days_late = (date.today() - loan.due_date).days
-            return days_late * 5 #₹5/day
-        return 0.0
+        return True
+        
     
     def open_loan_account(self, member_id: str):
         self.pending_loans[member_id] = {}

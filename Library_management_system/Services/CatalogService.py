@@ -60,6 +60,12 @@ class CatalogService :
         book = self.books.get(book_isbn, None)
         return book
     
+    def find_book_by_author_name(self, book_title: str, author_name: str):
+        for _, book in self.books.items():
+            if book.title == book_title and book.author.name == author_name:
+                return book
+        return None
+    
     def add_new_book(self, book_title:str, author_name:str, total_copies:int=1 ):
         """Add a new book in library under the Existing author if author exists, else add new author also and then add book under them."""
 
@@ -86,3 +92,22 @@ class CatalogService :
     def add_imported_book(self, book: Book, author_id: str):
         book.author = self.find_author_by_id(author_id)
         self.add_book(book)
+
+    def search_books_by_title(self, search_title:str):
+        """Find the books whose title contains the search title query."""
+
+        return [book for _, book in self.books.items() if search_title.lower() in book.title.lower()]
+    
+    def search_books_by_author_name(self, author_name:str):
+        """Find the books whose author's name matches the given author name, return empty list if not found."""
+
+        return [book for _, book in self.books.items() if author_name.lower() in book.author.name.lower()]
+    
+    def search_authors(self, search_name:str):
+        """Find the authors whose name contains the search name query."""
+
+        return [author for _, author in self.authors.items() if search_name.lower() in author.name.lower()]
+    
+    def get_total_books(self):
+        """Returns the total books in the library catalog"""
+        return self.total_books

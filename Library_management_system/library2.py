@@ -35,3 +35,25 @@ class Library:
         self.logging_service.log_new_loan(self, new_loan)
         self.analytics_service.update_data(new_loan)
 
+    def return_loan(self, member_id:str, book_title:str, author_name:str):
+        loan = self.loan_service.return_book(member_id, book_title, author_name)
+        if self.to_save_data: self.data_service.export_loans_json(self)
+        if self.to_save_data: self.data_service.export_members_json(self)
+        if self.to_save_data: self.save_library_data()
+        fine = self.penalty_service.calculate_penalty(loan)
+        self.logging_service.log_loan_return(self, loan, fine)
+
+    def get_currently_loaned_books(self, filter=None):
+        """Returns the list of the books that are currently loaned by any member in list format, returns empty list in case of no books loaned."""
+
+        loaned_books = []
+
+        for member_id, loans in self.loan_service.pending_loans.items():
+            for book_isbn, loan in loans.items():
+                if filter == "overdue" :
+                    if self.loan_service.is_overdue(loan):
+                        loaned_books.append(loan)
+                else:
+                    loaned_books.append(loan)
+
+        return loaned_books

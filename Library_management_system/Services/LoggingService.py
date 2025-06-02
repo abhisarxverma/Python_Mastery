@@ -10,3 +10,6 @@ class LoggingService:
 
     def log_new_loan(loan: Loan):
         logging.info(f'Member ID {loan.member.member_id} borrowed "{loan.book.title}" | Due {loan.due_date} | Fine Paid : Rs.0')
+
+    def log_loan_return(loan: Loan, fine: int):
+        logging.info(f'Member ID {loan.member.member_id} returned "{loan.book.title}" | Fine Paid Rs.{fine}')

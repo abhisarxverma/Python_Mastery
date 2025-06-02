@@ -1,4 +1,7 @@
 from ..models.member import Member
+from ..utils import *
+
+CLASSNAME = "MEMBERSERVICE"
 
 class MemberService:
 
@@ -32,4 +35,12 @@ class MemberService:
 
     def add_imported_member(self, member:Member):
         member.fine_balance = 0
-        self.members[id] = member
+        self.all_members[member.member_id] = member
+
+    def get_fine_of_member(self, member_id:str):
+        """Show the fine of the member by finding the member by member id."""
+
+        member = self.find_member(member_id)
+        if not member: raise_error(CLASSNAME, f"Invalid member id: {member_id} Please recheck.")
+        fine = member.fine_balance
+        return fine
