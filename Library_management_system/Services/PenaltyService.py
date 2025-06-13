@@ -1,11 +1,12 @@
 from ..models.loan import Loan
 from datetime import date
+from ..utils import AutoErrorDecorate
 
-class PenaltyService:
+class PenaltyService(AutoErrorDecorate):
 
     def __init__(self):
         self.penalty_per_day = 5 # Rs 5 for one day delay
-
+        self.total_fine_collected = 0
 
     def calculate_penalty(self, loan: Loan) -> float:
         if self.is_overdue(loan):
@@ -18,3 +19,6 @@ class PenaltyService:
         
         if date.today() > loan.due_date: return True
         else : return False
+
+    def pay_fine(self, amount: int):
+        self.total_fine_collected += amount

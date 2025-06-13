@@ -1,21 +1,20 @@
 from ..models.member import Member
 from ..utils import *
 
-CLASSNAME = "MEMBERSERVICE"
-
-class MemberService:
+class MemberService(AutoErrorDecorate):
 
     def __init__(self):
         self.all_members = {}
+        self.total_members = 0
 
-    def all_members(self):
+    def give_all_members(self):
         return self.all_members.items()
 
     def register_member(self, name) -> Member:
         """Create a new member and add them to the Data."""
-
         new_member = Member(name)
         self.all_members[new_member.member_id] = new_member
+        self.total_members += 1
         return new_member
     
     def find_member(self, member_id:str) -> Member:
@@ -36,6 +35,7 @@ class MemberService:
     def add_imported_member(self, member:Member):
         member.fine_balance = 0
         self.all_members[member.member_id] = member
+        self.total_members += 1
 
     def get_fine_of_member(self, member_id:str):
         """Show the fine of the member by finding the member by member id."""

@@ -11,7 +11,7 @@ def member_interface(library) :
                 name = get_validated_input(f"Enter Member name: ", check_minimum_length, f"{RED}\nName must be atleast 3 characters.")
 
                 try:
-                    new_member = library.register_member(name)
+                    new_member = library.signup_new_member(name)
                 except Exception as e:
                     show_error_message(e)
                 else:
@@ -77,7 +77,7 @@ def member_interface(library) :
             
             
         elif user_choice == 5:
-            if not library.get_total_books():
+            if not library.has_no_books():
                 show_general_message("Library is Currently Empty. Sorry for the Inconvenience!")
                 continue
             while True:

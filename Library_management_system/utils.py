@@ -10,7 +10,8 @@ LOG_FILE_PATH = "log.txt"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def give_absolute_path(path):
-    return os.path.join(BASE_DIR, path)
+    path = os.path.join(BASE_DIR, path)
+    return path
 
 def date_to_str(date):
     if isinstance(date, str):  # Convert string to datetime
@@ -58,3 +59,27 @@ def raise_error(class_name: str, message: str):
 
     caller = stack_trace[-2].name
     raise ValueError(f"{class_name} : {caller} : {message}")
+
+# A class to auto decorate any decorator to all the subclasses
+class AutoErrorDecorate:
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        for attr_name, attr_value in cls.__dict__.items():
+            if callable(attr_value) and not attr_name.startswith("__"):
+                setattr(cls, attr_name, error_decorator(attr_value))
+
+
+def error_decorator(func):
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            stack_trace = traceback.extract_stack()
+            caller = stack_trace[-1].name  # Gets the method name
+            method_name = func.__name__  
+
+            # Extract the class name (if method belongs to a class)
+            class_name = func.__qualname__.split(".")[0]  # Gets the defining class
+            raise ValueError(f"Error in {class_name}.{method_name} - {e}")
+
+    return wrapper

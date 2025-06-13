@@ -1,7 +1,7 @@
 from ..models.book import Book, Author
-from ..utils import raise_error
+from ..utils import AutoErrorDecorate
 
-class CatalogService :
+class CatalogService(AutoErrorDecorate) :
 
     def __init__(self):
         self.books : dict = {}

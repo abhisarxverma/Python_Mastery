@@ -2,14 +2,12 @@ from ..models.book import Book
 from ..models.loan import Loan
 from ..models.member import Member
 from datetime import date
-from MemberService import MemberService
-from CatalogService import CatalogService
-from PenaltyService import PenaltyService
-from utils import raise_error
+from .MemberService import MemberService
+from .CatalogService import CatalogService
+from .PenaltyService import PenaltyService
+from ..utils import AutoErrorDecorate
 
-CLASSNAME = "LOANSERVICE"
-
-class LoanService:
+class LoanService(AutoErrorDecorate):
 
     def __init__(self, member_service: MemberService, catalog_service: CatalogService, penalty_service: PenaltyService):
         self.pending_loans = {}
@@ -34,11 +32,8 @@ class LoanService:
             book = self.catalog_service.find_book_by_title(book_title)
         if not book: raise_error(CLASSNAME, f"{book_title} is not present in the library.")
 
-        try:
-            loan = self.loans[member.member_id].get(book.isbn, None)
-            return loan
-        except Exception as e:
-            raise_error(CLASSNAME, f"{e}")
+        loan = self.loans[member.member_id].get(book.isbn, None)
+        return loan
 
         
     def loan_book(self, member_id:str, book_title:str, days:int=None):
@@ -88,7 +83,7 @@ class LoanService:
 
         # Assuming that the member will pay the fine of the current book when he will return the book
         if fine := self.penalty_service.calculate_penalty(loan):
-            self.total_fine_collected += fine
+            self.penalty_service.pay_fine(fine)
             member.fine_balance -= fine
 
         loan.returned_date = date.today()
@@ -97,10 +92,18 @@ class LoanService:
         
         return True
         
-    
     def open_loan_account(self, member_id: str):
         self.pending_loans[member_id] = {}
 
     def add_imported_loan(self, loan: Loan):
         self.pending_loans[loan.member.member_id][loan.book.isbn] = loan
         self.member_service.add_fine_balance(loan.member, self.calculate_penalty(loan))
+
+    def get_all_loans_of_member(self, member_id: str) -> list:
+        """Finds and return all the current loans of the member with the given member id."""
+        member_loans = []
+        loan_dict = self.pending_loans[member_id]
+        for _, loan in loan_dict.items():
+            member_loans.append(loan)
+
+        return member_loans
