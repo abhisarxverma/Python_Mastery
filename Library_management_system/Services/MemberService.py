@@ -9,10 +9,15 @@ class MemberService(AutoErrorDecorate):
 
     def give_all_members(self):
         return self.all_members.items()
+    
+    def import_members(self, data):
+        self.all_members = data
 
     def register_member(self, name) -> Member:
         """Create a new member and add them to the Data."""
         new_member = Member(name)
+        member_check = self.find_member(new_member.member_id)
+        if member_check: raise ValueError(f"Member with name {name} already exists.")
         self.all_members[new_member.member_id] = new_member
         self.total_members += 1
         return new_member
@@ -41,6 +46,6 @@ class MemberService(AutoErrorDecorate):
         """Show the fine of the member by finding the member by member id."""
 
         member = self.find_member(member_id)
-        if not member: raise_error(CLASSNAME, f"Invalid member id: {member_id} Please recheck.")
+        if not member: raise ValueError(f"Invalid member id: {member_id} Please recheck.")
         fine = member.fine_balance
         return fine

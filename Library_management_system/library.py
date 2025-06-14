@@ -10,7 +10,7 @@ from .utils import *
 
 LIBRARY_DATA_JSON_PATH = give_absolute_path("data/library.json")
 
-class Library():
+class Library(AutoErrorDecorate):
 
     def __init__(self, to_import: bool=True, to_save_data: bool=True):
         self.member_service = MemberService()
@@ -38,6 +38,10 @@ class Library():
         self.to_save_data = to_save_data
         self.to_import = to_import
 
+        if (self.to_import) :
+            self.member_service.import_members(self.data_service.import_members_json())
+            self.import_library_catalog()
+
     def signup_new_member(self, member_name: str):
         new_member = self.member_service.register_member(member_name)
         self.loan_service.open_loan_account(new_member.member_id)
@@ -60,5 +64,13 @@ class Library():
 
     def has_no_books(self):
         return self.catalog_service.total_books == 0
-
     
+    def add_new_book_in_catalog(self, book_title: str, book_author:str, book_copies:int):
+        self.catalog_service.add_book_by_title(book_title, book_author, book_copies)
+        self.export_library_catalog()
+
+    def import_library_catalog(self):
+        self.catalog_service.import_catalog()
+
+    def export_library_catalog(self):
+        self.catalog_service.export_catalog()

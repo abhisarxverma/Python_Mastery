@@ -7,18 +7,16 @@ def member_interface(library) :
         user_choice = take_int_input(f"{YELLOW}Enter your choice> {WHITE}")
 
         if user_choice == 1:
-            while True:
-                name = get_validated_input(f"Enter Member name: ", check_minimum_length, f"{RED}\nName must be atleast 3 characters.")
+            name = get_validated_input(f"Enter Member name: ", check_minimum_length, f"{RED}\nName must be atleast 3 characters.")
 
-                try:
-                    new_member = library.signup_new_member(name)
-                except Exception as e:
-                    show_error_message(e)
-                else:
-                    show_success_message("Member successfully Registered.")
-                    print(f"{BRIGHT_WHITE}Please keep your credentials.")
-                    print(f"{GREEN}Member Id for {new_member.name} : {new_member.member_id}")
-                    break
+            try:
+                new_member = library.signup_new_member(name)
+            except Exception as e:
+                show_error_message(e)
+            else:
+                show_success_message("Member successfully Registered.")
+                print(f"{BRIGHT_WHITE}Please keep your credentials.")
+                print(f"{GREEN}Member Id for {new_member.name} : {new_member.member_id}")
 
         elif user_choice == 2:
             while True:
@@ -35,7 +33,7 @@ def member_interface(library) :
                     continue
                 
                 try:
-                    library.add_new_book(book_title, book_author_name, total_copies)
+                    library.add_new_book_in_catalog(book_title, book_author_name, total_copies)
                 except Exception as e:
                     show_error_message(e)
                     break
@@ -52,7 +50,7 @@ def member_interface(library) :
                 show_error_message("Please enter the number of days.")
                 continue
             try:
-                new_loan = library.loan_book(member_id, book_name, days)
+                new_loan = library.issue_new_loan(member_id, book_name, days)
             except Exception as e:
                 show_error_message(e)
                 

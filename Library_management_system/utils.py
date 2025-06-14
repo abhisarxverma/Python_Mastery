@@ -4,6 +4,7 @@ from datetime import datetime, date, timedelta
 import random
 import os
 import traceback
+import json
 
 LOG_FILE_PATH = "log.txt"
 
@@ -70,16 +71,26 @@ class AutoErrorDecorate:
 
 
 def error_decorator(func):
+    """Decorator to capture class name, method name, and line number on error."""
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
         except Exception as e:
-            stack_trace = traceback.extract_stack()
-            caller = stack_trace[-1].name  # Gets the method name
-            method_name = func.__name__  
+            tb = traceback.extract_tb(e.__traceback__)  # Get full traceback
+            last_trace = tb[-1]  # Get the last traceback entry (where error occurred)
 
-            # Extract the class name (if method belongs to a class)
-            class_name = func.__qualname__.split(".")[0]  # Gets the defining class
-            raise ValueError(f"Error in {class_name}.{method_name} - {e}")
+            method_name = func.__name__  
+            class_name = func.__qualname__.split(".")[0]  # Extract class name
+            line_number = last_trace.lineno  # Extract line number
+
+            raise ValueError(f"Error in {class_name}.{method_name} at line {line_number} - {e}")
 
     return wrapper
+
+def safe_json_load(filepath: str):
+    try: 
+        with open(filepath, "r") as file:
+            data = json.load(file)
+        return data
+    except json.JSONDecodeError :
+        return None
