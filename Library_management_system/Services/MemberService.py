@@ -1,5 +1,8 @@
 from ..models.member import Member
-from ..utils import *
+from ..utils import AutoErrorDecorate, give_absolute_path, safe_json_dump, safe_json_load
+import json
+
+MEMBER_DATA_JSON_PATH = give_absolute_path("data/members.json")
 
 class MemberService(AutoErrorDecorate):
 
@@ -9,9 +12,6 @@ class MemberService(AutoErrorDecorate):
 
     def give_all_members(self):
         return self.all_members.items()
-    
-    def import_members(self, data):
-        self.all_members = data
 
     def register_member(self, name) -> Member:
         """Create a new member and add them to the Data."""
@@ -49,3 +49,25 @@ class MemberService(AutoErrorDecorate):
         if not member: raise ValueError(f"Invalid member id: {member_id} Please recheck.")
         fine = member.fine_balance
         return fine
+
+    def export_members_json(self, filepath=MEMBER_DATA_JSON_PATH):
+        """Export the members data to the json file."""
+
+        serialized_data = {id : member.serialize() for id, member in self.give_all_members()}
+
+        safe_json_dump(serialized_data, filepath)
+
+        return True
+
+    def import_members_json(self, filepath=MEMBER_DATA_JSON_PATH):
+        """Import the members data from the json file."""
+
+        data = safe_json_load(filepath)
+
+        if not data: return
+
+        for _, member_data in data.items():
+            member = Member.make_member_object(member_data)
+            self.all_members[member.member_id] = member
+
+        return True

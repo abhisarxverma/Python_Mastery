@@ -1,7 +1,10 @@
 from .MemberService import MemberService
 from .CatalogService import CatalogService
 from .LoanService import LoanService
-from ..utils import AutoErrorDecorate
+from ..utils import AutoErrorDecorate, give_absolute_path, safe_json_dump, safe_json_load
+import json
+
+ANALYTICS_DATA_JSON_PATH = give_absolute_path("data/library.json")
 
 class AnalyticsService(AutoErrorDecorate) :
 
@@ -55,3 +58,25 @@ class AnalyticsService(AutoErrorDecorate) :
             }
 
         return data
+    
+    def export_library_stats(self, filepath=ANALYTICS_DATA_JSON_PATH):
+        data = {
+            "Total Fine collected" : self.penalty_service.total_fine_collected,
+            "Total Books" : self.catalog.total_books,
+            "Total Members" : self.member_service.total_members,
+            "Total Staff" : 10
+        }
+        safe_json_load(self.data, filepath)
+
+        return True
+
+    def import_library_stats(self, filepath=ANALYTICS_DATA_JSON_PATH):
+        """Imports the data from the json file in the data directory"""
+
+        data = safe_json_load(filepath)
+
+        if not data: return False
+
+        self.data = data
+        
+        return True

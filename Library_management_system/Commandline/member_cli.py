@@ -62,12 +62,13 @@ def member_interface(library) :
         elif user_choice == 4:
             member_id = input(f"{MAGENTA}\nEnter member id: ")
             book_title = input(f"{MAGENTA}\nEnter book name: ")
-            fine = library.find_member(member_id).fine_balance
+            author_name = input(f"{MAGENTA}\nEnter author name: ")
+            fine = library.get_member_fine(member_id)
             if fine:
                 show_general_message(f"\n{YELLOW}Book returned {fine//5} day(s) late. Fine: ₹{fine}")
                 show_general_message(f"{RED}You have to pay fine of: ₹{fine}")
             try:
-                library.return_book(member_id, book_title)
+                library.return_loan(member_id, book_title, author_name)
             except Exception as e:
                 show_error_message(e)                    
             else:

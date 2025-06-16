@@ -8,8 +8,8 @@ class LoggingService:
         self.logging_file = give_absolute_path("Log/app.log")
         logging.basicConfig(filename=self.logging_file, level=logging.INFO, format="%(asctime)s - %(message)s")
 
-    def log_new_loan(loan: Loan):
+    def log_new_loan(self, loan: Loan):
         logging.info(f'Member ID {loan.member.member_id} borrowed "{loan.book.title}" | Due {loan.due_date} | Fine Paid : Rs.0')
 
-    def log_loan_return(loan: Loan, fine: int):
+    def log_loan_return(self, loan: Loan, fine: int):
         logging.info(f'Member ID {loan.member.member_id} returned "{loan.book.title}" | Fine Paid Rs.{fine}')

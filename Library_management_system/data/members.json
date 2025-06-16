@@ -1,28 +1,14 @@
 {
+    "7845574": {
+        "id": "7845574",
+        "name": "abhsiar",
+        "fine_balance": 0.0,
+        "max_loans": 5,
+        "current_loans_count": 2
+    },
     "410": {
         "id": "410",
         "name": "ron",
-        "fine_balance": 0,
-        "max_loans": 5,
-        "current_loans_count": 0
-    },
-    "7845574": {
-        "id": "7845574",
-        "name": "abhisar",
-        "fine_balance": 0,
-        "max_loans": 5,
-        "current_loans_count": 0
-    },
-    "47441": {
-        "id": "47441",
-        "name": "harry",
-        "fine_balance": 0,
-        "max_loans": 5,
-        "current_loans_count": 0
-    },
-    "47478": {
-        "id": "47478",
-        "name": "rahul",
         "fine_balance": 0,
         "max_loans": 5,
         "current_loans_count": 0

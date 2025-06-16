@@ -94,3 +94,7 @@ def safe_json_load(filepath: str):
         return data
     except json.JSONDecodeError :
         return None
+    
+def safe_json_dump(data, filepath: str):
+    with open(filepath, "w") as file:
+        json.dump(data, file, indent=4)
