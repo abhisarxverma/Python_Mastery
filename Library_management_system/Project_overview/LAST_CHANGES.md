@@ -1,14 +1,14 @@
 # LAST CHANGES
 ***Things I worked on last time.***
 
-- put the data import and export in the respective modules
-- delete the dataservice
-- made the cli work
-- adding book, new loan issue and return loan and registering member is working
+- Made the Member's cli work fully
+- Made the admin's cli work fully
+- Made the analysis cli work fully
+- Put the object making classmethods into the respective service files for cleaner actions
+- Removed library.json and functions related to import and export
+- All the library data the books and member's stats will go in one file
 
 ## NEXT TASKS
 ***Need to do next***
 
-- Analytics service is buggy, it is causing error, need to clear it
-- make the member's cli work and then the analytics cli work
-- then the assignment will end
+- Assignment 7 ends here

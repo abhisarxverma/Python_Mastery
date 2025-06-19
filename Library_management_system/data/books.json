@@ -1,16 +1,23 @@
 {
-    "1070111071001001210100": {
-        "title": "shadowslave",
-        "author": "120611111111111",
-        "isbn": "1070111071001001210100",
+    "1121002071010101": {
+        "title": "on the hand",
+        "author": "54811111",
+        "isbn": "1121002071010101",
         "total_copies": 5,
         "available_copies": 5
     },
-    "011102102017011110221090": {
-        "title": "house of dragon",
-        "author": "899111131191",
-        "isbn": "011102102017011110221090",
-        "total_copies": 3,
-        "available_copies": 3
+    "101110719010101201001": {
+        "title": "neuromancer",
+        "author": "9921111311111",
+        "isbn": "101110719010101201001",
+        "total_copies": 5,
+        "available_copies": 5
+    },
+    "070780717170101017": {
+        "title": "mahabharata",
+        "author": "7521111119",
+        "isbn": "070780717170101017",
+        "total_copies": 5,
+        "available_copies": 5
     }
 }

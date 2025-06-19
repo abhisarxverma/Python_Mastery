@@ -22,16 +22,16 @@ def admin_interface(library) :
             show_loaned_books(overdue_loans)
 
         elif admin_command == 4:
-            total_fine_collected = library.total_fine_collected()
+            total_fine_collected = library.get_total_fine_collected()
             show_general_message(f"Total fine Collected : Rs.{total_fine_collected}")
 
         elif admin_command == 5:
             member_id = take_general_input("Enter Member Id : ")
-            member = library.find_member(member_id)
-            show_member(member)
+            member, loans_of_member = library.get_member_details(member_id)
+            show_member(member, loans_of_member)
 
         elif admin_command == 6:
-            library.save_library_data()
+            library.export_analytics_data()
             show_success_message(f"Library data successfully exported.")
 
         elif admin_command == 7:

@@ -5,7 +5,7 @@ from datetime import date
 from .MemberService import MemberService
 from .CatalogService import CatalogService
 from .PenaltyService import PenaltyService
-from ..utils import AutoErrorDecorate, give_absolute_path, safe_json_load, safe_json_dump
+from ..utils import AutoErrorDecorate, give_absolute_path, safe_json_load, safe_json_dump, str_to_date
 import json
 
 LOAN_DATA_JSON_PATH = give_absolute_path("data/loans.json")
@@ -20,6 +20,17 @@ class LoanService(AutoErrorDecorate):
 
     def give_all_loans(self):
         return self.pending_loans.items()
+    
+    def make_loan_object(self, data:dict, member:Member=None):
+        """Makes and return the loan object from the serialized loan data."""
+        loan = Loan(
+            book = self.catalog_service.find_book_by_isbn(data["book"]),
+            member = member or self.member_service.find_member(data["member_id"]),
+            loan_date = str_to_date(data["loan_date"]),
+            due_date = str_to_date(data["due_date"]),
+            returned_date = str_to_date(data["returned_date"]) if data["returned_date"] != "N/A" else "N/A"
+        )
+        return loan
 
     def find_loan(self, member_id:str, book_title:str = None, book_isbn:str = None) -> Loan:
         """Finds and return the loan with the member_id and the book_title return None if not found."""
@@ -84,23 +95,26 @@ class LoanService(AutoErrorDecorate):
 
         member = self.member_service.find_member(member_id)
 
+        result = {
+            "is_book_returned": True,
+            "fine_paid" : 0,
+            "loan_object": loan
+        }
+
         # Assuming that the member will pay the fine of the current book when he will return the book
         if fine := self.penalty_service.calculate_penalty(loan):
             self.penalty_service.pay_fine(fine)
             member.fine_balance -= fine
+            result["fine_paid"] = fine
 
         loan.returned_date = date.today()
         loan.book.available_copies += 1
         self.pending_loans[member_id].pop(loan.book.isbn)
         
-        return loan
+        return result
         
     def open_loan_account(self, member_id: str):
         self.pending_loans[member_id] = {}
-
-    def add_imported_loan(self, loan: Loan):
-        self.pending_loans[loan.member.member_id][loan.book.isbn] = loan
-        self.member_service.add_fine_balance(loan.member, self.penalty_service.calculate_penalty(loan))
 
     def get_all_loans_of_member(self, member_id: str) -> list:
         """Finds and return all the current loans of the member with the given member id."""
@@ -138,7 +152,12 @@ class LoanService(AutoErrorDecorate):
             
         for _, loans in data.items():
             for _, loan_dict in loans.items():
-                loan = Loan.make_loan_object(self.catalog_service, self.member_service, loan_dict)
-                self.add_imported_loan(loan)
+                loan = self.make_loan_object(loan_dict)
+                self.pending_loans[loan.member.member_id][loan.book.isbn] = loan
+                self.member_service.add_fine_balance(loan.member, self.penalty_service.calculate_penalty(loan))
+                self.update_member_loan_count(loan)
 
         return True
+    
+    def update_member_loan_count(self, loan:Loan):
+        loan.member.current_loans_count += 1

@@ -129,7 +129,7 @@ def show_loaned_books(loans : List[Loan]):
         print_loan_summary(loan)
         print("-"*50)
 
-def show_member(member: Member):
+def show_member(member: Member, loans_of_member: List[Loan]):
     print(f"""
 Id   : {member.member_id}
 Name : {member.name}
@@ -137,8 +137,7 @@ Max loans limit : {member.max_loans}
 Current loans count : {member.current_loans_count}
           """)
     
-    loans = library.get_all_loans_of_member(member.member_id)
-    show_loaned_books(loans)
+    show_loaned_books(loans_of_member)
 
 def print_n_most_borrowed_books(result : list, n : int):
     print(f"\n{GREEN}Top {n} most borrowed books - \n")

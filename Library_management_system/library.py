@@ -24,7 +24,8 @@ class Library(AutoErrorDecorate):
         self.analytics_service = AnalyticsService(
             member_service=self.member_service,
             catalog_service=self.catalog_service,
-            loan_service=self.loan_service
+            loan_service=self.loan_service,
+            penalty_service=self.penalty_service
         )
 
         self.to_save_data = to_save_data
@@ -34,30 +35,37 @@ class Library(AutoErrorDecorate):
             self.import_members()
             self.import_library_catalog()
             self.import_loans()
+            self.import_analytics_data()
 
     def signup_new_member(self, member_name: str):
         new_member = self.member_service.register_member(member_name)
         self.loan_service.open_loan_account(new_member.member_id)
-        self.export_members()
+        self.analytics_service.open_member_analytics_account(new_member)
+        self.analytics_service.new_member_update()
+        if self.to_save_data:
+            self.export_members()
+            self.export_analytics_data()
         return new_member
 
     def issue_new_loan(self, member_id: str, book_name: str, number_of_days: int):
         new_loan = self.loan_service.loan_book(member_id, book_name, number_of_days)
-        if self.to_save_data: self.export_loans()
         self.logging_service.log_new_loan(new_loan)
-        self.analytics_service.update_data(new_loan)
-
+        self.analytics_service.new_loan_update(new_loan)
+        if self.to_save_data: 
+            self.export_loans()
+            self.export_members()
+            self.export_analytics_data()
         return new_loan
 
     def return_loan(self, member_id:str, book_title:str, author_name:str):
-        loan = self.loan_service.return_book(member_id, book_title, author_name)
-        if self.to_save_data: self.export_loans()
-        if self.to_save_data: self.export_members()
-        if self.to_save_data: self.export_analytics_data()
-        fine = self.penalty_service.calculate_penalty(loan)
-        self.logging_service.log_loan_return(loan, fine)
-
-        return loan
+        result = self.loan_service.return_book(member_id, book_title, author_name)
+        self.logging_service.log_loan_return(result["loan_object"], result["fine_paid"])
+        if result["fine_paid"]: self.analytics_service.update_total_fine()
+        if self.to_save_data: 
+            self.export_loans()
+            self.export_members()
+            self.export_analytics_data()
+        return result["loan_object"]
 
     def has_no_books(self):
         return self.catalog_service.total_books == 0
@@ -67,8 +75,31 @@ class Library(AutoErrorDecorate):
         return member.fine_balance
     
     def add_new_book_in_catalog(self, book_title: str, book_author:str, book_copies:int):
-        self.catalog_service.add_book_by_title(book_title, book_author, book_copies)
-        self.export_library_catalog()
+        new_book = self.catalog_service.add_book_by_title(book_title, book_author, book_copies)
+        self.analytics_service.open_book_analytics_account(new_book)
+        self.analytics_service.new_book_update()
+        if self.to_save_data: self.export_library_catalog()
+
+    def search_books_by_title(self, title: str):
+        return self.catalog_service.search_books_by_title(title)
+    
+    def search_books_by_author(self, author_name: str):
+        return self.catalog_service.search_books_by_author_name(author_name)
+    
+    def get_total_books(self):
+        return self.catalog_service.get_total_books()
+    
+    def get_currently_loaned_books(self, filter=None):
+        return self.analytics_service.query_loaned_books(filter)
+    
+    def get_total_fine_collected(self):
+        return self.penalty_service.total_fine_collected
+    
+    def get_member_details(self, member_id:str):
+        return (self.member_service.find_member(member_id), self.loan_service.get_all_loans_of_member(member_id))
+    
+    def find_n_most_borrowed_book(self, n: int):
+        return self.analytics_service.top_n_most_borrowed_books(n)
 
     def import_library_catalog(self):
         self.catalog_service.import_catalog()

@@ -12,6 +12,17 @@ class MemberService(AutoErrorDecorate):
 
     def give_all_members(self):
         return self.all_members.items()
+    
+    def make_member_object(self, data:dict):
+        """Makes and return the member object from the serialized member data imported from the json."""
+        member = Member(
+            member_id= data["id"],
+            name=data["name"],
+            max_loans=data["max_loans"],
+            current_loans_count = data["current_loans_count"],
+            fine_balance= data["fine_balance"]
+        )
+        return member
 
     def register_member(self, name) -> Member:
         """Create a new member and add them to the Data."""
@@ -67,7 +78,12 @@ class MemberService(AutoErrorDecorate):
         if not data: return
 
         for _, member_data in data.items():
-            member = Member.make_member_object(member_data)
+            member = self.make_member_object(member_data)
             self.all_members[member.member_id] = member
+            member.current_loans_count = 0
+            self.total_members += 1
 
         return True
+    
+    def increase_member_loan_count(self, member: Member):
+        member.current_loans_count += 1

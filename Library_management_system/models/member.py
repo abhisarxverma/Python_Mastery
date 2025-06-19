@@ -31,15 +31,3 @@ class Member:
             "current_loans_count" : self.current_loans_count,
         }
     
-    @classmethod
-    def make_member_object(cls, data:dict):
-        """Makes and return the member object from the serialized member data imported from the json."""
-        member = cls(
-            member_id= data["id"],
-            name=data["name"],
-            max_loans=data["max_loans"],
-            current_loans_count = data["current_loans_count"],
-            fine_balance= data["fine_balance"]
-        )
-        return member
-    

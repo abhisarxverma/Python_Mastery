@@ -14,6 +14,25 @@ class CatalogService(AutoErrorDecorate) :
 
     def __repr__(self):
         return f"Books : {[book.title for _, book in self.books.items()]}\nAuthors : {[author.name for _, author in self.authors.items()]}"
+    
+    def make_book_object(self, data):
+        """Makes and return the book object from the serialized book data."""
+        book = Book(
+            title = data["title"],
+            isbn = data["isbn"],
+            total_copies = data["total_copies"],
+            available_copies = data["available_copies"]
+        )
+        return book
+    
+    def make_author_object(self, data):
+        """Makes and return the author object from the searialized author data."""
+        author = Author(
+            name=data["name"],
+            id=data["id"],
+            biography=data["biography"]
+        )
+        return author
 
     def all_books(self):
         return self.books.items()
@@ -24,7 +43,6 @@ class CatalogService(AutoErrorDecorate) :
     def add_book_by_object(self, book:Book) -> None:
         '''Add book in Library if the book is not already present.'''
         self.books[book.isbn] = book
-        self.total_books += 1
 
     def remove_book(self, book:Book) -> None:
         '''Remove book from Library if the book is present in Library.'''
@@ -122,9 +140,10 @@ class CatalogService(AutoErrorDecorate) :
         if not data: return
 
         for _, book_dict in data.items():
-            book = Book.make_book_object(book_dict)
+            book = self.make_book_object(book_dict)
             book.author = self.find_author_by_id(book_dict["author"])
             self.add_book_by_object(book)
+            self.total_books += 1
 
     def export_books_json(self,  filepath=BOOKS_DATA_JSON_PATH):
         """Export the library books data in catalog to the json."""
@@ -150,6 +169,6 @@ class CatalogService(AutoErrorDecorate) :
         if not data: return
 
         for _, author_dict in data.items():
-            author = Author.make_author_object(author_dict)
+            author = self.make_author_object(author_dict)
             if self.find_author_by_id(author_dict["id"]): raise ValueError(f"{author.name}'s books are already present in Library.")
             self.authors[author.id] = author

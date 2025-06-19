@@ -36,15 +36,4 @@ class Loan:
             "due_date" : date_to_str(self.due_date),
             "returned_date" : date_to_str(self.returned_date) if isinstance(self.returned_date, date) else "N/A"
         }
-    
-    @classmethod
-    def make_loan_object(cls, catalog_service:CatalogService, member_service:MemberService, data, member:Member=None):
-        """Makes and return the loan object from the serialized loan data."""
-        loan = cls(
-            book = catalog_service.find_book_by_isbn(data["book"]),
-            member = member or member_service.find_member(data["member_id"]),
-            loan_date = str_to_date(data["loan_date"]),
-            due_date = str_to_date(data["due_date"]),
-            returned_date = str_to_date(data["returned_date"]) if data["returned_date"] != "N/A" else "N/A"
-        )
-        return loan
+

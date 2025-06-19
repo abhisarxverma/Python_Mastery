@@ -30,15 +30,6 @@ class Author:
             "biography" : self.biography,
         }
     
-    @classmethod
-    def make_author_object(cls, data):
-        """Makes and return the author object from the searialized author data."""
-        author = cls(
-            name=data["name"],
-            id=data["id"],
-            biography=data["biography"]
-        )
-        return author
 
 class Book:
     """Represents a Book in Library"""
@@ -74,14 +65,4 @@ class Book:
             "available_copies" : self.available_copies
         }
     
-    @classmethod
-    def make_book_object(cls, data):
-        """Makes and return the book object from the serialized book data."""
-        book = cls(
-            title = data["title"],
-            isbn = data["isbn"],
-            total_copies = data["total_copies"],
-            available_copies = data["available_copies"]
-        )
-        return book
     

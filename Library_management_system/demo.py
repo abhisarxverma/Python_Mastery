@@ -2,4 +2,4 @@ from .library import Library
 
 library = Library()
 
-print(library.loan_service.pending_loans)
+print(library.analytics_service.data)

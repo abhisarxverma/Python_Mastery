@@ -76,7 +76,7 @@ def member_interface(library) :
             
             
         elif user_choice == 5:
-            if not library.has_no_books():
+            if library.has_no_books():
                 show_general_message("Library is Currently Empty. Sorry for the Inconvenience!")
                 continue
             while True:
@@ -99,7 +99,7 @@ def member_interface(library) :
 
                 elif selection == 2:
                     author_name = take_general_input(prompt="Enter author name: ")
-                    result_books = library.search_books_by_author_name(author_name)
+                    result_books = library.search_books_by_author(author_name)
                     print_book_search_result(result_books) if result_books else show_general_message("No Book Found.")
                     break
 
